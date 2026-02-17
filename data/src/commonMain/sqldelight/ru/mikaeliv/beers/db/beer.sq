@@ -1,0 +1,72 @@
+-- Схема таблицы и запросы для сущности "пиво".
+-- Поддерживает offline-first синхронизацию с сервером.
+
+CREATE TABLE beer (
+  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  server_id TEXT,
+  name TEXT NOT NULL,
+  abv REAL NOT NULL,
+  comment TEXT,
+  rating INTEGER NOT NULL,
+  photo BLOB,
+  sync_status TEXT NOT NULL DEFAULT 'SYNCED'
+);
+
+-- Получить все записи для отображения (исключаем PENDING_DELETE)
+getAll:
+SELECT * FROM beer WHERE sync_status != 'PENDING_DELETE' ORDER BY id DESC;
+
+-- Получить одну запись по id
+getById:
+SELECT * FROM beer WHERE id = ?;
+
+-- Получить запись по server_id
+getByServerId:
+SELECT * FROM beer WHERE server_id = ?;
+
+-- Получить все записи со статусом PENDING_CREATE (для отправки на сервер)
+getPendingCreate:
+SELECT * FROM beer WHERE sync_status = 'PENDING_CREATE';
+
+-- Получить все записи со статусом PENDING_DELETE (для удаления на сервере)
+getPendingDelete:
+SELECT * FROM beer WHERE sync_status = 'PENDING_DELETE';
+
+-- Добавить новую запись (локально, без server_id)
+insertBeer:
+INSERT INTO beer(name, abv, comment, rating, photo, sync_status)
+VALUES (?, ?, ?, ?, ?, ?);
+
+-- Добавить запись с сервера (с server_id, статус SYNCED)
+insertFromServer:
+INSERT INTO beer(server_id, name, abv, comment, rating, photo, sync_status)
+VALUES (?, ?, ?, ?, ?, ?, 'SYNCED');
+
+-- Обновить запись по id
+updateBeer:
+UPDATE beer SET name = ?, abv = ?, comment = ?, rating = ?, photo = ?
+WHERE id = ?;
+
+-- Обновить server_id и статус после успешной синхронизации
+updateSyncStatus:
+UPDATE beer SET server_id = ?, sync_status = ? WHERE id = ?;
+
+-- Пометить как удалённую (для последующей синхронизации)
+markAsDeleted:
+UPDATE beer SET sync_status = 'PENDING_DELETE' WHERE id = ?;
+
+-- Удалить запись по id (физическое удаление после синхронизации)
+deleteBeer:
+DELETE FROM beer WHERE id = ?;
+
+-- Удалить все записи (для полной пересинхронизации)
+deleteAll:
+DELETE FROM beer;
+
+-- Удалить все синхронизированные записи (перед pull с сервера)
+deleteSynced:
+DELETE FROM beer WHERE sync_status = 'SYNCED';
+
+-- Вернуть id последней вставленной записи
+lastInsertRowId:
+SELECT last_insert_rowid();
