@@ -26,3 +26,23 @@ data class BeerResponse(
     val description: String?,
     val createdAt: String, // ISO-8601 строка, парсится на стороне клиента при необходимости
 )
+
+/**
+ * Метаданные страницы в ответе с пагинацией.
+ */
+@Serializable
+data class PageMetadata(
+    val size: Int,
+    val number: Int,
+    val totalElements: Int,
+    val totalPages: Int,
+)
+
+/**
+ * Ответ API с пагинацией.
+ */
+@Serializable
+data class BeersPageResponse(
+    val content: List<BeerResponse>,
+    val page: PageMetadata,
+)

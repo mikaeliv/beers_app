@@ -19,6 +19,10 @@ interface BeerListComponent {
     val state: Value<List<Beer>>
     /** Статус синхронизации. */
     val isRefreshing: StateFlow<Boolean>
+    /** Есть ли ещё страницы для загрузки. */
+    val hasMorePages: StateFlow<Boolean>
+    /** Статус загрузки следующей страницы. */
+    val isLoadingMore: StateFlow<Boolean>
     /** Обработчик клика по кнопке добавления. */
     fun onAddClick()
     /** Открыть детальный экран по id. */
@@ -27,6 +31,8 @@ interface BeerListComponent {
     fun onProfileClick()
     /** Обновить данные (pull-to-refresh). */
     fun onRefresh()
+    /** Загрузить следующую страницу. */
+    fun onLoadMore()
     /** Освободить ресурсы (отмена корутин и т.п.). */
     fun onDestroy()
 
@@ -52,6 +58,8 @@ class DefaultBeerListComponent(
     private val _state = MutableValue<List<Beer>>(emptyList())
     override val state: Value<List<Beer>> = _state
     override val isRefreshing: StateFlow<Boolean> = syncEngine.isSyncing
+    override val hasMorePages: StateFlow<Boolean> = syncEngine.hasMorePages
+    override val isLoadingMore: StateFlow<Boolean> = syncEngine.isLoadingMore
 
     init {
         scope.launch {
@@ -65,5 +73,6 @@ class DefaultBeerListComponent(
     override fun onOpen(beerId: Long) = output.openDetail(beerId)
     override fun onProfileClick() = output.openProfile()
     override fun onRefresh() = syncEngine.sync()
+    override fun onLoadMore() = syncEngine.loadMore()
     override fun onDestroy() { scope.cancel() }
 }

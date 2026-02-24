@@ -4,6 +4,7 @@ import ru.mikaeliv.beers.network.ApiResult
 import ru.mikaeliv.beers.network.AuthenticatedApiClient
 import ru.mikaeliv.beers.network.dto.BeerRequest
 import ru.mikaeliv.beers.network.dto.BeerResponse
+import ru.mikaeliv.beers.network.dto.BeersPageResponse
 
 /**
  * API для работы с пивом.
@@ -13,12 +14,14 @@ class BeerApi(
     private val apiClient: AuthenticatedApiClient = AuthenticatedApiClient(),
 ) {
     /**
-     * Получает список всех пив.
+     * Получает список пив с пагинацией.
      *
-     * @return результат со списком пива или ошибка
+     * @param page номер страницы (0-based)
+     * @param size размер страницы
+     * @return результат с пагинированным ответом (content, page) или ошибка
      */
-    suspend fun getBeers(): ApiResult<List<BeerResponse>> =
-        apiClient.get("/beers")
+    suspend fun getBeers(page: Int = 0, size: Int = 20): ApiResult<BeersPageResponse> =
+        apiClient.get("/beers?page=$page&size=$size")
 
     /**
      * Добавляет новое пиво.

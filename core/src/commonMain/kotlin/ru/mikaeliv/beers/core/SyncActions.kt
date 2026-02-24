@@ -10,11 +10,20 @@ interface SyncActions {
     /** Статус синхронизации. */
     val isSyncing: StateFlow<Boolean>
     
+    /** Есть ли ещё страницы для загрузки. */
+    val hasMorePages: StateFlow<Boolean>
+    
+    /** Статус загрузки следующей страницы. */
+    val isLoadingMore: StateFlow<Boolean>
+    
     /** Полная синхронизация (push + pull). */
     fun sync()
     
     /** Только загрузка с сервера. */
     fun pullOnly()
+    
+    /** Загрузить следующую страницу (для infinite scroll). */
+    fun loadMore()
     
     /** Синхронизация после создания записи. */
     fun syncCreate(localId: Long)

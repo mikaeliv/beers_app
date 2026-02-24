@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import ru.mikaeliv.beers.network.ApiResult
 import ru.mikaeliv.beers.network.connectivity.NetworkState
 import ru.mikaeliv.beers.core.SyncActions
 import ru.mikaeliv.beers.core.SyncStatus
@@ -21,6 +22,8 @@ import ru.mikaeliv.beers.network.dto.BeerRequest
  * Реализует offline-first архитектуру с автоматической синхронизацией
  * при восстановлении соединения.
  */
+private const val PAGE_SIZE = 20
+
 class SyncEngine(
     private val repository: BeerRepository,
     private val beerApi: BeerApi = BeerApi(),
@@ -30,8 +33,16 @@ class SyncEngine(
     private val _isSyncing = MutableStateFlow(false)
     override val isSyncing: StateFlow<Boolean> = _isSyncing.asStateFlow()
 
+    private val _hasMorePages = MutableStateFlow(true)
+    override val hasMorePages: StateFlow<Boolean> = _hasMorePages.asStateFlow()
+
+    private val _isLoadingMore = MutableStateFlow(false)
+    override val isLoadingMore: StateFlow<Boolean> = _isLoadingMore.asStateFlow()
+
     private val _lastError = MutableStateFlow<String?>(null)
     val lastError: StateFlow<String?> = _lastError.asStateFlow()
+
+    private var lastLoadedPage = -1
     
     /** Состояние сети (online/offline). */
     val isOnline: StateFlow<Boolean>
@@ -69,7 +80,7 @@ class SyncEngine(
             try {
                 withContext(Dispatchers.Default) {
                     pushToServer()
-                    pullFromServer()
+                    pullFromServer(fetchAllPages = true)
                 }
             } catch (e: Exception) {
                 _lastError.value = e.message
@@ -82,6 +93,7 @@ class SyncEngine(
     /**
      * Только pull данных с сервера (без push).
      * Используется при первой загрузке после авторизации.
+     * Загружает только первую страницу для быстрого отображения.
      * 
      * В offline режиме ничего не делает.
      */
@@ -95,12 +107,54 @@ class SyncEngine(
             
             try {
                 withContext(Dispatchers.Default) {
-                    pullFromServer()
+                    pullFromServer(fetchAllPages = false)
                 }
             } catch (e: Exception) {
                 _lastError.value = e.message
             } finally {
                 _isSyncing.value = false
+            }
+        }
+    }
+
+    /**
+     * Загружает следующую страницу (для infinite scroll).
+     */
+    override fun loadMore() {
+        if (_isLoadingMore.value) return
+        if (!_hasMorePages.value) return
+        if (!isOnline.value) return
+        
+        scope.launch {
+            _isLoadingMore.value = true
+            _lastError.value = null
+            
+            try {
+                withContext(Dispatchers.Default) {
+                    val nextPage = lastLoadedPage + 1
+                    val result = beerApi.getBeers(page = nextPage, size = PAGE_SIZE)
+                    
+                    result.onSuccess { pageResponse ->
+                        for (serverBeer in pageResponse.content) {
+                            val existing = repository.getByServerId(serverBeer.id)
+                            if (existing == null) {
+                                repository.insertFromServer(
+                                    serverId = serverBeer.id,
+                                    name = serverBeer.name,
+                                    abv = serverBeer.abv,
+                                    rating = serverBeer.rating,
+                                    comment = serverBeer.description
+                                )
+                            }
+                        }
+                        lastLoadedPage = nextPage
+                        _hasMorePages.value = (pageResponse.page.number + 1) < pageResponse.page.totalPages
+                    }
+                }
+            } catch (e: Exception) {
+                _lastError.value = e.message
+            } finally {
+                _isLoadingMore.value = false
             }
         }
     }
@@ -246,27 +300,44 @@ class SyncEngine(
 
     /**
      * Загружает данные с сервера и обновляет локальную БД.
+     * @param fetchAllPages если true — загружает все страницы; если false — только первую
      */
-    private suspend fun pullFromServer() {
-        val result = beerApi.getBeers()
-
-        result.onSuccess { serverBeers ->
-            // Удаляем синхронизированные записи (которые точно есть на сервере)
-            // Локальные несинхронизированные записи сохраняем
-            repository.deleteSynced()
-
-            // Добавляем данные с сервера
-            for (serverBeer in serverBeers) {
-                // Проверяем, нет ли уже такой записи (по server_id)
-                val existing = repository.getByServerId(serverBeer.id)
-                if (existing == null) {
-                    repository.insertFromServer(
-                        serverId = serverBeer.id,
-                        name = serverBeer.name,
-                        abv = serverBeer.abv,
-                        rating = serverBeer.rating,
-                        comment = serverBeer.description
-                    )
+    private suspend fun pullFromServer(fetchAllPages: Boolean = true) {
+        // Удаляем синхронизированные записи
+        repository.deleteSynced()
+        
+        lastLoadedPage = -1
+        var page = 0
+        var hasMore = true
+        
+        while (hasMore) {
+            val result = beerApi.getBeers(page = page, size = PAGE_SIZE)
+            
+            when (result) {
+                is ApiResult.Success -> {
+                    val pageResponse = result.data
+                    val serverBeers = pageResponse.content
+                    for (serverBeer in serverBeers) {
+                        val existing = repository.getByServerId(serverBeer.id)
+                        if (existing == null) {
+                            repository.insertFromServer(
+                                serverId = serverBeer.id,
+                                name = serverBeer.name,
+                                abv = serverBeer.abv,
+                                rating = serverBeer.rating,
+                                comment = serverBeer.description
+                            )
+                        }
+                    }
+                    lastLoadedPage = page
+                    val hasNextPage = (pageResponse.page.number + 1) < pageResponse.page.totalPages
+                    _hasMorePages.value = hasNextPage
+                    hasMore = fetchAllPages && hasNextPage
+                    page++
+                }
+                is ApiResult.Error -> {
+                    _lastError.value = result.message
+                    break
                 }
             }
         }
