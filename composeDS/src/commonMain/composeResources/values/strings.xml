@@ -54,4 +54,6 @@
     <string name="icon_star_filled">Закрашенная звезда</string>
     <string name="icon_star_empty">Пустая звезда</string>
     <string name="icon_warning">Предупреждение</string>
+    <string name="icon_visibility">Показать пароль</string>
+    <string name="icon_visibility_off">Скрыть пароль</string>
 </resources>
