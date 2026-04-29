@@ -1,11 +1,11 @@
 package ru.mikaeliv.beers.network.api
 
 import io.ktor.client.request.forms.MultiPartFormDataContent
-import io.ktor.client.request.forms.formData
 import io.ktor.http.ContentType
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
-import kotlinx.serialization.encodeToString
+import io.ktor.http.content.PartData
+import io.ktor.utils.io.core.ByteReadPacket
 import kotlinx.serialization.json.Json
 import ru.mikaeliv.beers.network.ApiResult
 import ru.mikaeliv.beers.network.AuthenticatedApiClient
@@ -44,7 +44,7 @@ class BeerApi(
     suspend fun saveBeer(
         request: BeerRequest,
         imageBytes: ByteArray? = null,
-        imageFileName: String = "beer-image.jpg",
+        imageFileName: String = request.defaultImageFileName(),
         imageContentType: String = "image/jpeg",
     ): ApiResult<BeerResponse> {
         if (request.id == null && imageBytes == null) {
@@ -54,30 +54,49 @@ class BeerApi(
         return apiClient.postMultipart(
             endpoint = "/beers",
             body = MultiPartFormDataContent(
-                formData {
-                    append(
-                        key = "beer",
+                listOfNotNull(
+                    PartData.FormItem(
                         value = json.encodeToString(request),
-                        headers = Headers.build {
+                        dispose = {},
+                        partHeaders = Headers.build {
+                            append(HttpHeaders.ContentDisposition, "form-data; name=\"beer\"")
                             append(HttpHeaders.ContentType, ContentType.Application.Json.toString())
                         }
-                    )
-                    if (imageBytes != null) {
-                        append(
-                            key = "image",
-                            value = imageBytes,
-                            headers = Headers.build {
-                                append(HttpHeaders.ContentType, imageContentType)
+                    ),
+                    imageBytes?.let { bytes ->
+                        PartData.BinaryItem(
+                            provider = { ByteReadPacket(bytes) },
+                            dispose = {},
+                            partHeaders = Headers.build {
                                 append(
                                     HttpHeaders.ContentDisposition,
-                                    "form-data; name=\"image\"; filename=\"$imageFileName\""
+                                    "form-data; name=\"image\"; filename=\"${imageFileName.toHeaderValue()}\""
                                 )
+                                append(HttpHeaders.ContentType, imageContentType)
+                                append(HttpHeaders.ContentLength, bytes.size.toString())
                             }
                         )
                     }
-                }
+                )
             )
         )
+    }
+
+    private fun String.toHeaderValue(): String {
+        return replace("\\", "\\\\")
+            .replace("\"", "\\\"")
+            .replace("\r", "")
+            .replace("\n", "")
+    }
+
+    private fun BeerRequest.defaultImageFileName(): String {
+        val sanitizedName = name
+            .trim()
+            .replace(Regex("\\s+"), "-")
+            .replace(Regex("[\\\\/\\r\\n\"]"), "")
+            .ifBlank { "beer" }
+
+        return "$sanitizedName-beer-image.jpg"
     }
 
     suspend fun addBeer(request: BeerRequest, imageBytes: ByteArray): ApiResult<BeerResponse> =
