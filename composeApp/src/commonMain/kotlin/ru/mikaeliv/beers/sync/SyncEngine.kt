@@ -138,12 +138,14 @@ class SyncEngine(
                         for (serverBeer in pageResponse.content) {
                             val existing = repository.getByServerId(serverBeer.id)
                             if (existing == null) {
+                                val photoBytes = loadPhoto(serverBeer.imageUrl)
                                 repository.insertFromServer(
                                     serverId = serverBeer.id,
                                     name = serverBeer.name,
                                     abv = serverBeer.abv,
                                     rating = serverBeer.rating,
-                                    comment = serverBeer.description
+                                    comment = serverBeer.description,
+                                    photoBytes = photoBytes
                                 )
                             }
                         }
@@ -174,14 +176,19 @@ class SyncEngine(
                 val beer = repository.getById(localId) ?: return@withContext
                 if (beer.syncStatus != SyncStatus.PENDING_CREATE) return@withContext
 
+                val photoBytes = beer.photoBytes ?: run {
+                    _lastError.value = "Image is required"
+                    return@withContext
+                }
                 val result = beerApi.addBeer(
-                    BeerRequest(
+                    request = BeerRequest(
                         id = null,
                         name = beer.name,
                         rating = beer.rating,
                         abv = beer.abv,
                         description = beer.comment
-                    )
+                    ),
+                    imageBytes = photoBytes
                 )
 
                 result.onSuccess { response ->
@@ -260,14 +267,20 @@ class SyncEngine(
         for (beer in pendingCreate) {
             val localId = beer.id ?: continue
             
+            val photoBytes = beer.photoBytes
+            if (photoBytes == null) {
+                _lastError.value = "Image is required"
+                continue
+            }
             val result = beerApi.addBeer(
-                BeerRequest(
+                request = BeerRequest(
                     id = null,
                     name = beer.name,
                     rating = beer.rating,
                     abv = beer.abv,
                     description = beer.comment
-                )
+                ),
+                imageBytes = photoBytes
             )
 
             result.onSuccess { response ->
@@ -320,12 +333,14 @@ class SyncEngine(
                     for (serverBeer in serverBeers) {
                         val existing = repository.getByServerId(serverBeer.id)
                         if (existing == null) {
+                            val photoBytes = loadPhoto(serverBeer.imageUrl)
                             repository.insertFromServer(
                                 serverId = serverBeer.id,
                                 name = serverBeer.name,
                                 abv = serverBeer.abv,
                                 rating = serverBeer.rating,
-                                comment = serverBeer.description
+                                comment = serverBeer.description,
+                                photoBytes = photoBytes
                             )
                         }
                     }
@@ -339,6 +354,16 @@ class SyncEngine(
                     _lastError.value = result.message
                     break
                 }
+            }
+        }
+    }
+
+    private suspend fun loadPhoto(imageUrl: String): ByteArray? {
+        return when (val result = beerApi.getBeerImage(imageUrl)) {
+            is ApiResult.Success -> result.data
+            is ApiResult.Error -> {
+                _lastError.value = result.message
+                null
             }
         }
     }

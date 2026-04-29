@@ -2,6 +2,7 @@ package ru.mikaeliv.beers.network
 
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.header
@@ -49,6 +50,20 @@ class AuthenticatedApiClient(
             httpClient.post(buildUrl(endpoint)) {
                 header(HttpHeaders.Authorization, "Bearer $token")
                 contentType(ContentType.Application.Json)
+                setBody(body)
+            }
+        }
+
+    /**
+     * Выполняет POST-запрос с multipart/form-data и авторизацией.
+     */
+    suspend inline fun <reified R> postMultipart(
+        endpoint: String,
+        body: MultiPartFormDataContent,
+    ): ApiResult<R> =
+        executeWithRetry { token ->
+            httpClient.post(buildUrl(endpoint)) {
+                header(HttpHeaders.Authorization, "Bearer $token")
                 setBody(body)
             }
         }

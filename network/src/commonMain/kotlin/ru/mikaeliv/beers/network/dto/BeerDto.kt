@@ -24,6 +24,7 @@ data class BeerResponse(
     val rating: Int,
     val abv: Double,
     val description: String?,
+    val imageUrl: String,
     val createdAt: String, // ISO-8601 строка, парсится на стороне клиента при необходимости
 )
 
