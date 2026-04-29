@@ -67,6 +67,7 @@ class DefaultBeerListComponent(
             // так как коллекция возвращает уже готовые объекты.
             repo.getAll().collect { _state.value = it }
         }
+        syncEngine.pullOnly()
     }
 
     override fun onAddClick() = output.openAdd()

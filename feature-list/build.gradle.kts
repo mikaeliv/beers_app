@@ -1,10 +1,12 @@
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.androidLibrary)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
 }
 
 kotlin {
+    androidTarget()
     jvm()
     iosArm64()
     iosSimulatorArm64()
@@ -24,3 +26,8 @@ kotlin {
     }
 }
 
+android {
+    namespace = "ru.mikaeliv.beers.feature.list"
+    compileSdk = libs.versions.android.compileSdk.get().toInt()
+    defaultConfig { minSdk = libs.versions.android.minSdk.get().toInt() }
+}

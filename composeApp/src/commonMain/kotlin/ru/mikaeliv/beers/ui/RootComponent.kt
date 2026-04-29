@@ -113,8 +113,6 @@ class DefaultRootComponent(
 
     // Определяем начальный экран и запускаем sync если нужно
     private val initialConfig: Config = if (tokenStorage.isLoggedIn()) {
-        // Уже авторизован — запускаем фоновую синхронизацию
-        syncEngine.pullOnly()
         Config.List
     } else {
         Config.Auth
@@ -135,8 +133,6 @@ class DefaultRootComponent(
         Config.Auth -> RootComponent.Child.Auth(
             DefaultAuthComponent(ctx, authApi, object : AuthComponent.Output {
                 override fun onAuthSuccess() {
-                    // После успешной авторизации загружаем данные с сервера
-                    syncEngine.pullOnly()
                     navigation.replaceAll(Config.List)
                 }
             })

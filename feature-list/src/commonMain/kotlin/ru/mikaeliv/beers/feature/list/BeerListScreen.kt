@@ -41,6 +41,7 @@ import org.jetbrains.compose.resources.stringResource
 import ru.mikaeliv.beers.composeDS.components.BeerPhoto
 import ru.mikaeliv.beers.composeDS.icons.AddIcon
 import ru.mikaeliv.beers.composeDS.icons.PersonIcon
+import ru.mikaeliv.beers.composeDS.icons.RefreshIcon
 import ru.mikaeliv.beers.core.Beer
 
 private const val LOAD_MORE_THRESHOLD = 3
@@ -60,6 +61,11 @@ fun BeerListScreen(component: BeerListComponent) {
             TopAppBar(
                 title = { Text(stringResource(Res.string.beer_list_title)) },
                 actions = {
+                    if (showManualRefreshButton) {
+                        IconButton(onClick = component::onRefresh) {
+                            RefreshIcon()
+                        }
+                    }
                     IconButton(onClick = component::onProfileClick) {
                         PersonIcon()
                     }

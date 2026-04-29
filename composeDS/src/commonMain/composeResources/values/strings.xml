@@ -53,6 +53,7 @@
     <string name="icon_back">Назад</string>
     <string name="icon_settings">Настройки</string>
     <string name="icon_profile">Профиль</string>
+    <string name="icon_refresh">Обновить</string>
     <string name="icon_logout">Выйти</string>
     <string name="icon_star_filled">Закрашенная звезда</string>
     <string name="icon_star_empty">Пустая звезда</string>
