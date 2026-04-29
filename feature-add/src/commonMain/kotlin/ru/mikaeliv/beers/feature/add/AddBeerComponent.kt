@@ -21,6 +21,7 @@ data class AddBeerState(
     val abv: String = "",
     val rating: Int = 1,
     val comment: String = "",
+    val photoBytes: ByteArray? = null,
     val isSaving: Boolean = false,
     val isValid: Boolean = false,
 )
@@ -38,6 +39,8 @@ interface AddBeerComponent {
     fun onRatingChange(value: Int)
     /** Изменение комментария. */
     fun onCommentChange(value: String)
+    /** Выбор фотографии. */
+    fun onPhotoSelected(bytes: ByteArray)
     /** Попытка сохранить запись. */
     fun onSave()
     /** Освобождение ресурсов. */
@@ -71,17 +74,18 @@ class DefaultAddBeerComponent(
     override fun onAbvChange(value: String) = update { copy(abv = value) }
     override fun onRatingChange(value: Int) = update { copy(rating = value.coerceIn(1, 5)) }
     override fun onCommentChange(value: String) = update { copy(comment = value) }
+    override fun onPhotoSelected(bytes: ByteArray) = update { copy(photoBytes = bytes) }
 
     override fun onSave() {
         val s = _state.value
         val abv = s.abv.toDoubleOrNull() ?: 0.0
         val nameOk = s.name.isNotBlank()
-        if (!nameOk || abv <= 0.0 || s.rating !in 1..5) return
+        if (!nameOk || abv <= 0.0 || s.rating !in 1..5 || s.photoBytes == null) return
         _state.value = s.copy(isSaving = true)
         scope.launch {
             // БД — в фоне
             val localId = withContext(Dispatchers.Default) {
-                repo.add(Beer(null, null, s.name, abv, s.comment.ifBlank { null }, s.rating, null))
+                repo.add(Beer(null, null, s.name, abv, s.comment.ifBlank { null }, s.rating, s.photoBytes))
             }
             // Запускаем фоновую синхронизацию с сервером
             syncActions.syncCreate(localId)
@@ -94,7 +98,8 @@ class DefaultAddBeerComponent(
         val next = _state.value.block()
         _state.value = next.copy(
             isValid = next.name.isNotBlank() && (next.abv.toDoubleOrNull() ?: 0.0) > 0.0 &&
-                next.rating in 1..5
+                next.rating in 1..5 &&
+                next.photoBytes != null
         )
     }
 

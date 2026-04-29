@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -24,6 +25,7 @@ import beers.composeds.generated.resources.beer_detail_title
 import beers.composeds.generated.resources.delete
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import org.jetbrains.compose.resources.stringResource
+import ru.mikaeliv.beers.composeDS.components.BeerPhoto
 import ru.mikaeliv.beers.composeDS.components.BeersTopAppBar
 import ru.mikaeliv.beers.composeDS.components.StarRating
 
@@ -72,6 +74,13 @@ private fun BeerDetailContent(
         }
 
         Text(beer.name, style = MaterialTheme.typography.headlineSmall)
+        BeerPhoto(
+            photoBytes = beer.photoBytes,
+            contentDescription = beer.name,
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(16f / 9f)
+        )
         Text("ABV ${beer.abv}%", style = MaterialTheme.typography.bodyLarge)
         Row(
             verticalAlignment = Alignment.CenterVertically,

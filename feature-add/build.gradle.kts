@@ -1,10 +1,12 @@
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.androidLibrary)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
 }
 
 kotlin {
+    androidTarget()
     jvm()
     iosArm64()
     iosSimulatorArm64()
@@ -21,6 +23,14 @@ kotlin {
             implementation(libs.decompose.core)
             implementation(libs.decompose.extensions)
         }
+        androidMain.dependencies {
+            implementation(libs.androidx.activity.compose)
+        }
     }
 }
 
+android {
+    namespace = "ru.mikaeliv.beers.feature.add"
+    compileSdk = libs.versions.android.compileSdk.get().toInt()
+    defaultConfig { minSdk = libs.versions.android.minSdk.get().toInt() }
+}

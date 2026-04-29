@@ -17,6 +17,9 @@
     <string name="add_beer_abv_label">ABV (%)</string>
     <string name="add_beer_rating_label">Оценка:</string>
     <string name="add_beer_comment_label">Комментарий</string>
+    <string name="add_beer_photo_label">Фото</string>
+    <string name="add_beer_photo_button">Выбрать фото</string>
+    <string name="add_beer_photo_selected">Фото выбрано</string>
     
     <!-- Экран деталей пива -->
     <string name="beer_detail_title">Детали</string>

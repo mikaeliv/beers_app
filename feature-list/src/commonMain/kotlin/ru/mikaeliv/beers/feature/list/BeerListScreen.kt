@@ -5,9 +5,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -36,6 +38,7 @@ import beers.composeds.generated.resources.beer_list_empty_hint
 import beers.composeds.generated.resources.beer_list_title
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import org.jetbrains.compose.resources.stringResource
+import ru.mikaeliv.beers.composeDS.components.BeerPhoto
 import ru.mikaeliv.beers.composeDS.icons.AddIcon
 import ru.mikaeliv.beers.composeDS.icons.PersonIcon
 import ru.mikaeliv.beers.core.Beer
@@ -169,20 +172,31 @@ private fun BeerListContent(
 
 @Composable
 private fun BeerRow(beer: Beer, onClick: () -> Unit) {
-    Column(
+    Row(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
             .padding(horizontal = 16.dp, vertical = 12.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(beer.name, style = MaterialTheme.typography.titleMedium)
-        Text(
-            "ABV ${beer.abv} • ★ ${beer.rating}",
-            style = MaterialTheme.typography.bodyMedium
+        BeerPhoto(
+            photoBytes = beer.photoBytes,
+            contentDescription = beer.name,
+            modifier = Modifier.size(72.dp)
         )
-        if (!beer.comment.isNullOrBlank()) {
-            Text(beer.comment!!, style = MaterialTheme.typography.bodySmall)
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Text(beer.name, style = MaterialTheme.typography.titleMedium)
+            Text(
+                "ABV ${beer.abv} • ★ ${beer.rating}",
+                style = MaterialTheme.typography.bodyMedium
+            )
+            if (!beer.comment.isNullOrBlank()) {
+                Text(beer.comment!!, style = MaterialTheme.typography.bodySmall)
+            }
         }
     }
 }
