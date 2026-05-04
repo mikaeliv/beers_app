@@ -13,55 +13,69 @@ import androidx.compose.ui.graphics.Color
 private const val ANIMATION_DURATION = 500
 
 private val LightColorScheme = lightColorScheme(
-    primary = Color(0xFF6750A4),
-    onPrimary = Color.White,
-    primaryContainer = Color(0xFFEADDFF),
-    onPrimaryContainer = Color(0xFF21005D),
-    secondary = Color(0xFF625B71),
-    onSecondary = Color.White,
-    secondaryContainer = Color(0xFFE8DEF8),
-    onSecondaryContainer = Color(0xFF1D192B),
-    tertiary = Color(0xFF7D5260),
-    onTertiary = Color.White,
-    tertiaryContainer = Color(0xFFFFD8E4),
-    onTertiaryContainer = Color(0xFF31111D),
-    error = Color(0xFFB3261E),
-    onError = Color.White,
-    errorContainer = Color(0xFFF9DEDC),
-    onErrorContainer = Color(0xFF410E0B),
-    background = Color(0xFFFFFBFE),
-    onBackground = Color(0xFF1C1B1F),
-    surface = Color(0xFFFFFBFE),
-    onSurface = Color(0xFF1C1B1F),
-    surfaceVariant = Color(0xFFE7E0EC),
-    onSurfaceVariant = Color(0xFF49454F),
-    outline = Color(0xFF79747E),
+    primary = Color(0xFFD97706),
+    onPrimary = Color(0xFFFFFFFF),
+    primaryContainer = Color(0xFFFEF3C7),
+    onPrimaryContainer = Color(0xFF78350F),
+
+    secondary = Color(0xFFFBBF24),
+    onSecondary = Color(0xFF78350F),
+    secondaryContainer = Color(0xFFFEF3C7),
+    onSecondaryContainer = Color(0xFF78350F),
+
+    tertiary = Color(0xFFFBBF24),
+    onTertiary = Color(0xFF78350F),
+    tertiaryContainer = Color(0xFFF59E0B),
+    onTertiaryContainer = Color(0xFF78350F),
+
+    error = Color(0xFFDC2626),
+    onError = Color(0xFFFFFFFF),
+    errorContainer = Color(0xFFDC2626),
+    onErrorContainer = Color(0xFFFFFFFF),
+
+    background = Color(0xFFFDFBF7),
+    onBackground = Color(0xFF2D1F16),
+
+    surface = Color(0xFFFFFFFF),
+    onSurface = Color(0xFF2D1F16),
+
+    surfaceVariant = Color(0xFFF5F1E8),
+    onSurfaceVariant = Color(0xFF78716C),
+
+    outline = Color(0xFFE7E5DF),
 )
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Color(0xFFD0BCFF),
-    onPrimary = Color(0xFF381E72),
-    primaryContainer = Color(0xFF4F378B),
-    onPrimaryContainer = Color(0xFFEADDFF),
-    secondary = Color(0xFFCCC2DC),
-    onSecondary = Color(0xFF332D41),
-    secondaryContainer = Color(0xFF4A4458),
-    onSecondaryContainer = Color(0xFFE8DEF8),
-    tertiary = Color(0xFFEFB8C8),
-    onTertiary = Color(0xFF492532),
-    tertiaryContainer = Color(0xFF633B48),
-    onTertiaryContainer = Color(0xFFFFD8E4),
-    error = Color(0xFFF2B8B5),
-    onError = Color(0xFF601410),
-    errorContainer = Color(0xFF8C1D18),
-    onErrorContainer = Color(0xFFF9DEDC),
-    background = Color(0xFF1C1B1F),
-    onBackground = Color(0xFFE6E1E5),
-    surface = Color(0xFF1C1B1F),
-    onSurface = Color(0xFFE6E1E5),
-    surfaceVariant = Color(0xFF49454F),
-    onSurfaceVariant = Color(0xFFCAC4D0),
-    outline = Color(0xFF938F99),
+    primary = Color(0xFFF59E0B),
+    onPrimary = Color(0xFF1C1410),
+    primaryContainer = Color(0xFF44281D),
+    onPrimaryContainer = Color(0xFFFEF3C7),
+
+    secondary = Color(0xFFFBBF24),
+    onSecondary = Color(0xFF1C1410),
+    secondaryContainer = Color(0xFF44281D),
+    onSecondaryContainer = Color(0xFFFEF3C7),
+
+    tertiary = Color(0xFF78350F),
+    onTertiary = Color(0xFFFEF3C7),
+    tertiaryContainer = Color(0xFF92400E),
+    onTertiaryContainer = Color(0xFFFEF3C7),
+
+    error = Color(0xFFEF4444),
+    onError = Color(0xFFFEF3C7),
+    errorContainer = Color(0xFFEF4444),
+    onErrorContainer = Color(0xFFFEF3C7),
+
+    background = Color(0xFF1C1410),
+    onBackground = Color(0xFFFEF3C7),
+
+    surface = Color(0xFF2D1F16),
+    onSurface = Color(0xFFFEF3C7),
+
+    surfaceVariant = Color(0xFF44281D),
+    onSurfaceVariant = Color(0xFFA8A29E),
+
+    outline = Color(0xFF44281D),
 )
 
 /**
