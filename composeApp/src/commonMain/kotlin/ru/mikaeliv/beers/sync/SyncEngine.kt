@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withContext
 import ru.mikaeliv.beers.network.ApiResult
 import ru.mikaeliv.beers.network.connectivity.NetworkState
@@ -42,6 +43,7 @@ class SyncEngine(
     private val _lastError = MutableStateFlow<String?>(null)
     val lastError: StateFlow<String?> = _lastError.asStateFlow()
 
+    private val syncMutex = Mutex()
     private var lastLoadedPage = -1
     
     /** Состояние сети (online/offline). */
@@ -68,24 +70,29 @@ class SyncEngine(
      * 2. Pull данных с сервера
      * 
      * В offline режиме ничего не делает.
+     * Если синхронизация уже запущена, повторный вызов пропускается.
      */
     override fun sync() {
-        if (_isSyncing.value) return
         if (!isOnline.value) return // Offline — пропускаем
         
         scope.launch {
-            _isSyncing.value = true
-            _lastError.value = null
-            
+            if (!syncMutex.tryLock()) return@launch
             try {
-                withContext(Dispatchers.Default) {
-                    pushToServer()
-                    pullFromServer(fetchAllPages = true)
+                _isSyncing.value = true
+                _lastError.value = null
+
+                try {
+                    withContext(Dispatchers.Default) {
+                        pushToServer()
+                        pullFromServer(fetchAllPages = true)
+                    }
+                } catch (e: Exception) {
+                    _lastError.value = e.message
+                } finally {
+                    _isSyncing.value = false
                 }
-            } catch (e: Exception) {
-                _lastError.value = e.message
             } finally {
-                _isSyncing.value = false
+                syncMutex.unlock()
             }
         }
     }
@@ -96,23 +103,28 @@ class SyncEngine(
      * Загружает только первую страницу для быстрого отображения.
      * 
      * В offline режиме ничего не делает.
+     * Если синхронизация уже запущена, повторный вызов пропускается.
      */
     override fun pullOnly() {
-        if (_isSyncing.value) return
         if (!isOnline.value) return // Offline — пропускаем
         
         scope.launch {
-            _isSyncing.value = true
-            _lastError.value = null
-            
+            if (!syncMutex.tryLock()) return@launch
             try {
-                withContext(Dispatchers.Default) {
-                    pullFromServer(fetchAllPages = false)
+                _isSyncing.value = true
+                _lastError.value = null
+
+                try {
+                    withContext(Dispatchers.Default) {
+                        pullFromServer(fetchAllPages = false)
+                    }
+                } catch (e: Exception) {
+                    _lastError.value = e.message
+                } finally {
+                    _isSyncing.value = false
                 }
-            } catch (e: Exception) {
-                _lastError.value = e.message
             } finally {
-                _isSyncing.value = false
+                syncMutex.unlock()
             }
         }
     }
@@ -238,22 +250,27 @@ class SyncEngine(
     /**
      * Синхронизирует все ожидающие изменения.
      * Вызывается при восстановлении соединения.
+     *
+     * Не запускается параллельно с ручной синхронизацией или первичным pull.
      */
     private fun syncPendingChanges() {
-        if (_isSyncing.value) return
-        
         scope.launch {
-            _isSyncing.value = true
-            _lastError.value = null
-            
+            if (!syncMutex.tryLock()) return@launch
             try {
-                withContext(Dispatchers.Default) {
-                    pushToServer()
+                _isSyncing.value = true
+                _lastError.value = null
+
+                try {
+                    withContext(Dispatchers.Default) {
+                        pushToServer()
+                    }
+                } catch (e: Exception) {
+                    _lastError.value = e.message
+                } finally {
+                    _isSyncing.value = false
                 }
-            } catch (e: Exception) {
-                _lastError.value = e.message
             } finally {
-                _isSyncing.value = false
+                syncMutex.unlock()
             }
         }
     }

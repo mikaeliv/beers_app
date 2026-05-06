@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.arkivanov.decompose.ComponentContext
@@ -232,11 +233,13 @@ fun rememberRootComponent(
     instanceKeeper: InstanceKeeper,
     backHandler: BackHandler,
 ): RootComponent {
-    val context = DefaultComponentContext(
-        lifecycle = lifecycle,
-        stateKeeper = stateKeeper,
-        instanceKeeper = instanceKeeper,
-        backHandler = backHandler,
-    )
-    return DefaultRootComponent(context, repo, syncEngine = syncEngine)
+    return remember(repo, syncEngine, lifecycle, stateKeeper, instanceKeeper, backHandler) {
+        val context = DefaultComponentContext(
+            lifecycle = lifecycle,
+            stateKeeper = stateKeeper,
+            instanceKeeper = instanceKeeper,
+            backHandler = backHandler,
+        )
+        DefaultRootComponent(context, repo, syncEngine = syncEngine)
+    }
 }

@@ -16,10 +16,10 @@ import ru.mikaeliv.beers.sync.SyncEngine
  */
 @Composable
 fun BeersApp(repo: BeerRepository) {
-    val lifecycle = LifecycleRegistry()
-    val stateKeeper = StateKeeperDispatcher()
-    val instanceKeeper = InstanceKeeperDispatcher()
-    val backDispatcher = com.arkivanov.essenty.backhandler.BackDispatcher()
+    val lifecycle = remember { LifecycleRegistry() }
+    val stateKeeper = remember { StateKeeperDispatcher() }
+    val instanceKeeper = remember { InstanceKeeperDispatcher() }
+    val backDispatcher = remember { com.arkivanov.essenty.backhandler.BackDispatcher() }
     val syncEngine = remember { SyncEngine(repo) }
     val root = rememberRootComponent(repo, syncEngine, lifecycle, stateKeeper, instanceKeeper, backDispatcher)
     

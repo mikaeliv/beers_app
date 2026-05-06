@@ -3,7 +3,7 @@
 
 CREATE TABLE beer (
   id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-  server_id TEXT,
+  server_id TEXT UNIQUE,
   name TEXT NOT NULL,
   abv REAL NOT NULL,
   comment TEXT,
@@ -39,8 +39,19 @@ VALUES (?, ?, ?, ?, ?, ?);
 
 -- Добавить запись с сервера (с server_id, статус SYNCED)
 insertFromServer:
-INSERT INTO beer(server_id, name, abv, comment, rating, photo, sync_status)
+INSERT OR IGNORE INTO beer(server_id, name, abv, comment, rating, photo, sync_status)
 VALUES (?, ?, ?, ?, ?, ?, 'SYNCED');
+
+-- Обновить запись, пришедшую с сервера, не меняя локальный id
+updateFromServer:
+UPDATE beer
+SET name = ?,
+    abv = ?,
+    comment = ?,
+    rating = ?,
+    photo = ?,
+    sync_status = 'SYNCED'
+WHERE server_id = ?;
 
 -- Обновить запись по id
 updateBeer:

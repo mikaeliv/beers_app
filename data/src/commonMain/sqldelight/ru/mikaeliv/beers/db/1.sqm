@@ -1,0 +1,10 @@
+DELETE FROM beer
+WHERE server_id IS NOT NULL
+  AND id NOT IN (
+    SELECT MAX(id)
+    FROM beer
+    WHERE server_id IS NOT NULL
+    GROUP BY server_id
+  );
+
+CREATE UNIQUE INDEX beer_server_id_unique ON beer(server_id);

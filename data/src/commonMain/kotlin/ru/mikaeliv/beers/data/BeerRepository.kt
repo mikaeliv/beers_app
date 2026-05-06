@@ -68,15 +68,25 @@ class BeerRepository(private val database: BeersDatabase) {
         comment: String?,
         photoBytes: ByteArray? = null,
     ): Long {
-        queries.insertFromServer(
-            server_id = serverId,
-            name = name,
-            abv = abv,
-            comment = comment,
-            rating = rating.toLong(),
-            photo = photoBytes
-        )
-        return queries.lastInsertRowId().executeAsOne()
+        queries.transaction {
+            queries.insertFromServer(
+                server_id = serverId,
+                name = name,
+                abv = abv,
+                comment = comment,
+                rating = rating.toLong(),
+                photo = photoBytes
+            )
+            queries.updateFromServer(
+                name = name,
+                abv = abv,
+                comment = comment,
+                rating = rating.toLong(),
+                photo = photoBytes,
+                server_id = serverId
+            )
+        }
+        return getByServerId(serverId)?.id ?: queries.lastInsertRowId().executeAsOne()
     }
 
     /**
