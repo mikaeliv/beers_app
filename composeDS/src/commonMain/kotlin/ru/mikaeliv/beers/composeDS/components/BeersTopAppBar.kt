@@ -5,7 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -24,6 +23,8 @@ import beers.composeds.generated.resources.ic_arrow_back
 import beers.composeds.generated.resources.icon_back
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import org.jetbrains.compose.ui.tooling.preview.Preview
+import ru.mikaeliv.beers.composeDS.theme.BeersTheme
 
 /**
  * Переиспользуемый TopAppBar для приложения.
@@ -39,20 +40,20 @@ fun BeersTopAppBar(
     modifier: Modifier = Modifier,
     onBack: (() -> Unit)? = null,
 ) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
+    Box(
         modifier = modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surface)
+            .background(MaterialTheme.colorScheme.background)
             .statusBarsPadding()
-            .height(64.dp)
-            .padding(horizontal = 4.dp)
+            .height(96.dp)
+            .padding(horizontal = 24.dp)
     ) {
         if (onBack != null) {
             val interactionSource = remember { MutableInteractionSource() }
             Box(
                 modifier = Modifier
                     .size(48.dp)
+                    .align(Alignment.CenterStart)
                     .clickable(
                         interactionSource = interactionSource,
                         indication = null
@@ -66,16 +67,24 @@ fun BeersTopAppBar(
                     modifier = Modifier.size(24.dp)
                 )
             }
-        } else {
-            // Отступ слева, если нет кнопки назад
-            Box(modifier = Modifier.size(16.dp, 48.dp))
         }
 
         Text(
             text = title,
             style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.padding(start = 4.dp)
+            color = MaterialTheme.colorScheme.onBackground,
+            modifier = Modifier.align(Alignment.Center)
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun BeersTopAppBarPreview() {
+    BeersTheme {
+        BeersTopAppBar(
+            title = "Add Beer",
+            onBack = {}
         )
     }
 }

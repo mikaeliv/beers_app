@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import beers.composeds.generated.resources.Res
@@ -18,6 +19,8 @@ import beers.composeds.generated.resources.icon_star_empty
 import beers.composeds.generated.resources.icon_star_filled
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import org.jetbrains.compose.ui.tooling.preview.Preview
+import ru.mikaeliv.beers.composeDS.theme.BeersTheme
 
 /**
  * Компонент отображения рейтинга в виде звёздочек.
@@ -52,6 +55,13 @@ fun StarRating(
                 contentDescription = stringResource(
                     if (isFilled) Res.string.icon_star_filled else Res.string.icon_star_empty
                 ),
+                colorFilter = ColorFilter.tint(
+                    if (isFilled) {
+                        androidx.compose.material3.MaterialTheme.colorScheme.primary
+                    } else {
+                        androidx.compose.material3.MaterialTheme.colorScheme.outline
+                    }
+                ),
                 modifier = Modifier
                     .size(starSize)
                     .then(
@@ -66,5 +76,13 @@ fun StarRating(
                     )
             )
         }
+    }
+}
+
+@Preview
+@Composable
+private fun StarRatingPreview() {
+    BeersTheme {
+        StarRating(rating = 4, starSize = 32.dp)
     }
 }

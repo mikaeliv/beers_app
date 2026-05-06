@@ -8,14 +8,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -25,13 +24,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import org.jetbrains.compose.resources.stringResource
-import ru.mikaeliv.beers.composeDS.icons.VisibilityIcon
-import ru.mikaeliv.beers.composeDS.icons.VisibilityOffIcon
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import beers.composeds.generated.resources.Res
 import beers.composeds.generated.resources.auth_email_label
@@ -44,60 +42,73 @@ import beers.composeds.generated.resources.auth_switch_to_login
 import beers.composeds.generated.resources.auth_switch_to_register
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import org.jetbrains.compose.resources.stringResource
+import ru.mikaeliv.beers.composeDS.components.BeerLogo
+import ru.mikaeliv.beers.composeDS.components.BeersButton
+import ru.mikaeliv.beers.composeDS.components.BeersPillTextField
+import ru.mikaeliv.beers.composeDS.icons.VisibilityIcon
+import ru.mikaeliv.beers.composeDS.icons.VisibilityOffIcon
 
 @Composable
 fun AuthScreen(component: AuthComponent) {
     val state by component.state.subscribeAsState()
     var passwordVisible by remember { mutableStateOf(false) }
+    var confirmPassword by remember(state.isLoginMode) { mutableStateOf("") }
+    val canSubmit = !state.isLoading &&
+        state.email.isNotBlank() &&
+        state.password.isNotBlank() &&
+        (state.isLoginMode || confirmPassword == state.password)
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(24.dp),
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 32.dp, vertical = 56.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
+        BeerLogo(size = 112.dp)
+        Spacer(modifier = Modifier.height(34.dp))
         Text(
-            text = if (state.isLoginMode) {
-                stringResource(Res.string.auth_login_title)
-            } else {
-                stringResource(Res.string.auth_register_title)
-            },
+            text = if (state.isLoginMode) stringResource(Res.string.auth_login_title) else stringResource(Res.string.auth_register_title),
             style = MaterialTheme.typography.headlineMedium,
             color = MaterialTheme.colorScheme.onBackground,
+            textAlign = TextAlign.Center,
+        )
+        Text(
+            text = if (state.isLoginMode) "Track your craft beer journey" else "Start your beer collection",
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(top = 12.dp)
         )
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(54.dp))
 
-        OutlinedTextField(
+        AuthFieldLabel(stringResource(Res.string.auth_email_label))
+        BeersPillTextField(
             value = state.email,
             onValueChange = component::onEmailChange,
-            label = { Text(stringResource(Res.string.auth_email_label)) },
+            placeholder = if (state.isLoginMode) "Enter your username" else "Choose a username",
             singleLine = true,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Email,
-                imeAction = ImeAction.Next
-            ),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
             modifier = Modifier.fillMaxWidth(),
             enabled = !state.isLoading,
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(28.dp))
 
-        OutlinedTextField(
+        AuthFieldLabel(stringResource(Res.string.auth_password_label))
+        BeersPillTextField(
             value = state.password,
             onValueChange = component::onPasswordChange,
-            label = { Text(stringResource(Res.string.auth_password_label)) },
+            placeholder = if (state.isLoginMode) "Enter your password" else "Create a password",
             singleLine = true,
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(
                 keyboardType = if (passwordVisible) KeyboardType.Text else KeyboardType.Password,
-                imeAction = ImeAction.Done
+                imeAction = if (state.isLoginMode) ImeAction.Done else ImeAction.Next
             ),
-            keyboardActions = KeyboardActions(
-                onDone = { component.onSubmit() }
-            ),
+            keyboardActions = KeyboardActions(onDone = { if (canSubmit) component.onSubmit() }),
             trailingIcon = {
                 IconButton(onClick = { passwordVisible = !passwordVisible }) {
                     if (passwordVisible) {
@@ -111,44 +122,66 @@ fun AuthScreen(component: AuthComponent) {
             enabled = !state.isLoading,
         )
 
+        if (!state.isLoginMode) {
+            Spacer(modifier = Modifier.height(28.dp))
+            AuthFieldLabel("Confirm Password")
+            BeersPillTextField(
+                value = confirmPassword,
+                onValueChange = { confirmPassword = it },
+                placeholder = "Confirm your password",
+                singleLine = true,
+                visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
+                keyboardActions = KeyboardActions(onDone = { if (canSubmit) component.onSubmit() }),
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !state.isLoading,
+            )
+        }
+
         if (state.error != null) {
-            Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = state.error!!,
                 color = MaterialTheme.colorScheme.error,
                 style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(top = 18.dp),
+                textAlign = TextAlign.Center,
             )
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(44.dp))
 
         if (state.isLoading) {
-            CircularProgressIndicator()
+            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
         } else {
-            Button(
+            BeersButton(
+                text = if (state.isLoginMode) stringResource(Res.string.auth_login_button) else stringResource(Res.string.auth_register_button),
                 onClick = component::onSubmit,
+                enabled = canSubmit,
                 modifier = Modifier.fillMaxWidth(),
-            ) {
-                Text(
-                    text = if (state.isLoginMode) {
-                        stringResource(Res.string.auth_login_button)
-                    } else {
-                        stringResource(Res.string.auth_register_button)
-                    }
-                )
-            }
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            )
+        }
 
-            Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(26.dp))
 
-            TextButton(onClick = component::switchMode) {
-                Text(
-                    text = if (state.isLoginMode) {
-                        stringResource(Res.string.auth_switch_to_register)
-                    } else {
-                        stringResource(Res.string.auth_switch_to_login)
-                    }
-                )
-            }
+        TextButton(onClick = component::switchMode, enabled = !state.isLoading) {
+            Text(
+                text = if (state.isLoginMode) stringResource(Res.string.auth_switch_to_register) else stringResource(Res.string.auth_switch_to_login),
+                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
+}
+
+@Composable
+private fun AuthFieldLabel(text: String) {
+    Text(
+        text = text,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 2.dp, bottom = 12.dp),
+        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.82f),
+        style = MaterialTheme.typography.labelLarge,
+    )
 }

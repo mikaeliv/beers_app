@@ -1,41 +1,51 @@
 package ru.mikaeliv.beers.feature.add
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import beers.composeds.generated.resources.Res
 import beers.composeds.generated.resources.add_beer_abv_label
 import beers.composeds.generated.resources.add_beer_comment_label
 import beers.composeds.generated.resources.add_beer_name_label
-import beers.composeds.generated.resources.add_beer_photo_button
 import beers.composeds.generated.resources.add_beer_photo_label
-import beers.composeds.generated.resources.add_beer_photo_selected
 import beers.composeds.generated.resources.add_beer_rating_label
 import beers.composeds.generated.resources.add_beer_title
+import beers.composeds.generated.resources.ic_add
 import beers.composeds.generated.resources.save
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import ru.mikaeliv.beers.composeDS.components.BeerPhoto
+import ru.mikaeliv.beers.composeDS.components.BeersButton
+import ru.mikaeliv.beers.composeDS.components.BeersPillTextField
 import ru.mikaeliv.beers.composeDS.components.BeersTopAppBar
+import ru.mikaeliv.beers.composeDS.components.RoundIconSurface
 import ru.mikaeliv.beers.composeDS.components.StarRating
 
 @Composable
@@ -43,6 +53,7 @@ fun AddBeerScreen(component: AddBeerComponent) {
     val state by component.state.subscribeAsState()
     val imagePicker = rememberImagePicker(component::onPhotoSelected)
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             BeersTopAppBar(
                 title = stringResource(Res.string.add_beer_title),
@@ -53,103 +64,152 @@ fun AddBeerScreen(component: AddBeerComponent) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
                 .padding(padding)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+                .verticalScroll(rememberScrollState())
+                .padding(start = 24.dp, end = 24.dp, bottom = 40.dp),
+            verticalArrangement = Arrangement.spacedBy(26.dp)
         ) {
-            OutlinedTextField(
-                modifier = Modifier.fillMaxWidth(),
-                value = state.name,
-                onValueChange = component::onNameChange,
-                label = { Text(stringResource(Res.string.add_beer_name_label)) },
-                singleLine = true
+            PhotoPickerCard(
+                photoBytes = state.photoBytes,
+                onClick = imagePicker::launch,
+                enabled = !state.isSaving
             )
-            OutlinedTextField(
-                modifier = Modifier.fillMaxWidth(),
-                value = state.abv,
-                onValueChange = { raw ->
-                    // Разрешаем только цифры и один разделитель ('.' или ',').
-                    // Нормализуем ',' -> '.' чтобы дальше корректно парсилось через toDoubleOrNull().
-                    val cleaned = buildString {
-                        var hasSeparator = false
-                        for (ch in raw) {
-                            when {
-                                ch.isDigit() -> append(ch)
-                                (ch == '.' || ch == ',') && !hasSeparator -> {
-                                    append('.')
-                                    hasSeparator = true
+
+            LabeledField(stringResource(Res.string.add_beer_name_label)) {
+                BeersPillTextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = state.name,
+                    onValueChange = component::onNameChange,
+                    placeholder = "Enter beer name",
+                    singleLine = true,
+                    enabled = !state.isSaving
+                )
+            }
+
+            LabeledField(stringResource(Res.string.add_beer_abv_label)) {
+                BeersPillTextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = state.abv,
+                    onValueChange = { raw ->
+                        val cleaned = buildString {
+                            var hasSeparator = false
+                            for (ch in raw) {
+                                when {
+                                    ch.isDigit() -> append(ch)
+                                    (ch == '.' || ch == ',') && !hasSeparator -> {
+                                        append('.')
+                                        hasSeparator = true
+                                    }
                                 }
                             }
                         }
-                    }
-                    component.onAbvChange(cleaned)
-                },
-                label = { Text(stringResource(Res.string.add_beer_abv_label)) },
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
-            )
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Text(stringResource(Res.string.add_beer_rating_label), style = MaterialTheme.typography.bodyLarge)
-                StarRating(
-                    rating = state.rating,
-                    starSize = 32.dp,
-                    onRatingChange = component::onRatingChange
+                        component.onAbvChange(cleaned)
+                    },
+                    placeholder = "e.g., 5.5",
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                    enabled = !state.isSaving
                 )
-            }
-            OutlinedTextField(
-                modifier = Modifier.fillMaxWidth(),
-                value = state.comment,
-                onValueChange = component::onCommentChange,
-                label = { Text(stringResource(Res.string.add_beer_comment_label)) },
-                minLines = 3
-            )
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                BeerPhoto(
-                    photoBytes = state.photoBytes,
-                    contentDescription = stringResource(Res.string.add_beer_photo_label),
-                    modifier = Modifier
-                        .width(96.dp)
-                        .aspectRatio(1f)
-                )
-                Column(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    OutlinedButton(
-                        onClick = imagePicker::launch,
-                        enabled = !state.isSaving
-                    ) {
-                        Text(stringResource(Res.string.add_beer_photo_button))
-                    }
-                    if (state.photoBytes != null) {
-                        Text(
-                            text = stringResource(Res.string.add_beer_photo_selected),
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    }
-                }
             }
 
-            Button(
-                modifier = Modifier.fillMaxWidth(),
+            LabeledField(stringResource(Res.string.add_beer_rating_label).trimEnd(':')) {
+                StarRating(
+                    rating = state.rating,
+                    starSize = 40.dp,
+                    onRatingChange = component::onRatingChange,
+                    modifier = Modifier.padding(top = 6.dp)
+                )
+            }
+
+            LabeledField(stringResource(Res.string.add_beer_comment_label)) {
+                BeersPillTextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = state.comment,
+                    onValueChange = component::onCommentChange,
+                    placeholder = "Describe the beer's flavor, aroma, and your thoughts...",
+                    singleLine = false,
+                    minLines = 4,
+                    enabled = !state.isSaving
+                )
+            }
+
+            BeersButton(
+                text = stringResource(Res.string.save),
                 onClick = component::onSave,
-                enabled = state.isValid && !state.isSaving
-            ) {
-                if (state.isSaving) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.padding(end = 12.dp),
-                        strokeWidth = 2.dp
+                enabled = state.isValid && !state.isSaving,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 36.dp),
+                leadingIcon = if (state.isSaving) {
+                    {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(22.dp),
+                            strokeWidth = 2.dp,
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
+                } else {
+                    null
+                }
+            )
+        }
+    }
+}
+
+@Composable
+private fun PhotoPickerCard(
+    photoBytes: ByteArray?,
+    onClick: () -> Unit,
+    enabled: Boolean,
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(300.dp)
+            .clip(RoundedCornerShape(32.dp))
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .clickable(interactionSource = interactionSource, indication = null, enabled = enabled, onClick = onClick),
+        contentAlignment = Alignment.Center
+    ) {
+        if (photoBytes != null) {
+            BeerPhoto(
+                photoBytes = photoBytes,
+                contentDescription = stringResource(Res.string.add_beer_photo_label),
+                modifier = Modifier.fillMaxSize()
+            )
+        } else {
+            Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(18.dp)) {
+                RoundIconSurface(size = 76.dp) {
+                    androidx.compose.foundation.Image(
+                        painter = painterResource(Res.drawable.ic_add),
+                        contentDescription = null,
+                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurfaceVariant),
+                        modifier = Modifier.size(34.dp)
                     )
                 }
-                Text(stringResource(Res.string.save))
+                Text(
+                    text = "Tap to add photo",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
         }
+    }
+}
+
+@Composable
+private fun LabeledField(
+    label: String,
+    content: @Composable () -> Unit,
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.82f)
+        )
+        content()
     }
 }

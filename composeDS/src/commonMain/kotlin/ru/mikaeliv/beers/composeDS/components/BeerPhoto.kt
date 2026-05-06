@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -16,6 +17,8 @@ import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.decodeToImageBitmap
+import org.jetbrains.compose.ui.tooling.preview.Preview
+import ru.mikaeliv.beers.composeDS.theme.BeersTheme
 
 @Composable
 fun BeerPhoto(
@@ -31,7 +34,7 @@ fun BeerPhoto(
 
     Box(
         modifier = modifier
-            .clip(RoundedCornerShape(8.dp))
+            .clip(RoundedCornerShape(32.dp))
             .background(MaterialTheme.colorScheme.surfaceVariant),
         contentAlignment = Alignment.Center
     ) {
@@ -88,5 +91,17 @@ private fun DefaultBeerPhoto(modifier: Modifier = Modifier) {
                 style = androidx.compose.ui.graphics.drawscope.Stroke(width = w * 0.025f)
             )
         }
+    }
+}
+
+@Preview
+@Composable
+private fun BeerPhotoPreview() {
+    BeersTheme {
+        BeerPhoto(
+            photoBytes = null,
+            contentDescription = "Beer photo",
+            modifier = Modifier.size(180.dp)
+        )
     }
 }

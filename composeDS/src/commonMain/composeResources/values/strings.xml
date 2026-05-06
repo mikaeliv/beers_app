@@ -1,49 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Общие -->
-    <string name="back">Назад</string>
-    <string name="save">Сохранить</string>
-    <string name="delete">Удалить</string>
-    <string name="add">Добавить</string>
+    <string name="back">Back</string>
+    <string name="save">Save Beer</string>
+    <string name="delete">Delete</string>
+    <string name="add">Add</string>
     
     <!-- Экран списка пива -->
-    <string name="beer_list_title">Пиво</string>
-    <string name="beer_list_empty">Пока нет записей.</string>
-    <string name="beer_list_empty_hint">Нажмите «+», чтобы добавить первое пиво.</string>
+    <string name="beer_list_title">My Collection</string>
+    <string name="beer_list_empty">No beers yet.</string>
+    <string name="beer_list_empty_hint">Tap + to add your first beer.</string>
     
     <!-- Экран добавления пива -->
-    <string name="add_beer_title">Добавить пиво</string>
-    <string name="add_beer_name_label">Название</string>
+    <string name="add_beer_title">Add Beer</string>
+    <string name="add_beer_name_label">Beer Name</string>
     <string name="add_beer_abv_label">ABV (%)</string>
-    <string name="add_beer_rating_label">Оценка:</string>
-    <string name="add_beer_comment_label">Комментарий</string>
-    <string name="add_beer_photo_label">Фото</string>
-    <string name="add_beer_photo_button">Выбрать фото</string>
-    <string name="add_beer_photo_selected">Фото выбрано</string>
+    <string name="add_beer_rating_label">Rating</string>
+    <string name="add_beer_comment_label">Tasting Notes</string>
+    <string name="add_beer_photo_label">Photo</string>
+    <string name="add_beer_photo_button">Choose photo</string>
+    <string name="add_beer_photo_selected">Photo selected</string>
     
     <!-- Экран деталей пива -->
-    <string name="beer_detail_title">Детали</string>
+    <string name="beer_detail_title">Details</string>
     
     <!-- Экран настроек -->
-    <string name="settings_title">Настройки</string>
-    <string name="settings_dark_theme">Тёмная тема</string>
-    <string name="beer_detail_not_found">Запись не найдена</string>
-    <string name="beer_detail_rating_label">Оценка:</string>
+    <string name="settings_title">Settings</string>
+    <string name="settings_dark_theme">Dark theme</string>
+    <string name="beer_detail_not_found">Beer not found</string>
+    <string name="beer_detail_rating_label">Rating</string>
     
     <!-- Экран авторизации -->
-    <string name="auth_login_title">Вход</string>
-    <string name="auth_register_title">Регистрация</string>
-    <string name="auth_email_label">Email</string>
-    <string name="auth_password_label">Пароль</string>
-    <string name="auth_login_button">Войти</string>
-    <string name="auth_register_button">Зарегистрироваться</string>
-    <string name="auth_switch_to_register">Нет аккаунта? Зарегистрироваться</string>
-    <string name="auth_switch_to_login">Уже есть аккаунт? Войти</string>
+    <string name="auth_login_title">BeerLog</string>
+    <string name="auth_register_title">Create Account</string>
+    <string name="auth_email_label">Username</string>
+    <string name="auth_password_label">Password</string>
+    <string name="auth_login_button">Sign In</string>
+    <string name="auth_register_button">Create Account</string>
+    <string name="auth_switch_to_register">Don&apos;t have an account? Sign Up</string>
+    <string name="auth_switch_to_login">Already have an account? Sign In</string>
     
     <!-- Экран профиля -->
-    <string name="profile_title">Профиль</string>
-    <string name="profile_settings">Настройки</string>
-    <string name="profile_logout">Выйти из аккаунта</string>
+    <string name="profile_title">Profile</string>
+    <string name="profile_settings">Settings</string>
+    <string name="profile_logout">Logout</string>
     
     <!-- Offline баннер -->
     <string name="offline_banner_text">Нет подключения к интернету. Данные сохраняются локально.</string>
