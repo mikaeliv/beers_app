@@ -69,6 +69,7 @@ kotlin {
             implementation(projects.featureDetail)
             implementation(projects.featureAdd)
             implementation(projects.featureSettings)
+            implementation(projects.featureCamera)
             implementation(projects.core)
             implementation(libs.decompose.core)
             implementation(libs.decompose.extensions)

@@ -17,12 +17,17 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -47,11 +52,57 @@ import ru.mikaeliv.beers.composeDS.components.BeersPillTextField
 import ru.mikaeliv.beers.composeDS.components.BeersTopAppBar
 import ru.mikaeliv.beers.composeDS.components.RoundIconSurface
 import ru.mikaeliv.beers.composeDS.components.StarRating
+import ru.mikaeliv.beers.feature.camera.CameraComponent
+import ru.mikaeliv.beers.feature.camera.CameraScreen
+import ru.mikaeliv.beers.feature.camera.DefaultCameraComponent
+import ru.mikaeliv.beers.feature.camera.isCustomCameraAvailable
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddBeerScreen(component: AddBeerComponent) {
     val state by component.state.subscribeAsState()
     val imagePicker = rememberImagePicker(component::onPhotoSelected)
+    val isCameraAvailable = remember { isCustomCameraAvailable() }
+    var showPhotoSourceSheet by remember { mutableStateOf(false) }
+    var showCamera by remember { mutableStateOf(false) }
+    val cameraComponent = remember(component) {
+        DefaultCameraComponent(
+            object : CameraComponent.Output {
+                override fun back() {
+                    showCamera = false
+                }
+
+                override fun photoCaptured(bytes: ByteArray) {
+                    component.onPhotoSelected(bytes)
+                    showCamera = false
+                }
+            }
+        )
+    }
+
+    if (showCamera) {
+        CameraScreen(cameraComponent)
+        return
+    }
+
+    if (showPhotoSourceSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showPhotoSourceSheet = false },
+            containerColor = MaterialTheme.colorScheme.surface,
+        ) {
+            PhotoSourceSheet(
+                onCameraClick = {
+                    showPhotoSourceSheet = false
+                    showCamera = true
+                },
+                onGalleryClick = {
+                    showPhotoSourceSheet = false
+                    imagePicker.launch()
+                }
+            )
+        }
+    }
+
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
@@ -72,7 +123,13 @@ fun AddBeerScreen(component: AddBeerComponent) {
         ) {
             PhotoPickerCard(
                 photoBytes = state.photoBytes,
-                onClick = imagePicker::launch,
+                onClick = {
+                    if (isCameraAvailable) {
+                        showPhotoSourceSheet = true
+                    } else {
+                        imagePicker.launch()
+                    }
+                },
                 enabled = !state.isSaving
             )
 
@@ -155,6 +212,66 @@ fun AddBeerScreen(component: AddBeerComponent) {
             )
         }
     }
+}
+
+@Composable
+private fun PhotoSourceSheet(
+    onCameraClick: () -> Unit,
+    onGalleryClick: () -> Unit,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 12.dp, end = 12.dp, bottom = 28.dp),
+    ) {
+        Text(
+            text = "Add photo",
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 12.dp)
+        )
+        PhotoSourceItem(
+            title = "Take photo",
+            subtitle = "Open custom camera",
+            onClick = onCameraClick
+        )
+        PhotoSourceItem(
+            title = "Choose from gallery",
+            subtitle = "Open image picker",
+            onClick = onGalleryClick
+        )
+    }
+}
+
+@Composable
+private fun PhotoSourceItem(
+    title: String,
+    subtitle: String,
+    onClick: () -> Unit,
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+    ListItem(
+        headlineContent = {
+            Text(text = title, style = MaterialTheme.typography.bodyLarge)
+        },
+        supportingContent = {
+            Text(text = subtitle, style = MaterialTheme.typography.bodyMedium)
+        },
+        leadingContent = {
+            RoundIconSurface(size = 44.dp) {
+                androidx.compose.foundation.Image(
+                    painter = painterResource(Res.drawable.ic_add),
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurfaceVariant),
+                    modifier = Modifier.size(22.dp)
+                )
+            }
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(20.dp))
+            .clickable(interactionSource = interactionSource, indication = null, onClick = onClick)
+    )
 }
 
 @Composable
