@@ -51,6 +51,7 @@
     <!-- Иконки (contentDescription) -->
     <string name="icon_add">Добавить</string>
     <string name="icon_back">Назад</string>
+    <string name="icon_beer">Пиво</string>
     <string name="icon_settings">Настройки</string>
     <string name="icon_profile">Профиль</string>
     <string name="icon_refresh">Обновить</string>

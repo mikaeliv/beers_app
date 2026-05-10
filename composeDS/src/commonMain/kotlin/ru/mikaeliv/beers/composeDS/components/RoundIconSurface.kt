@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import ru.mikaeliv.beers.composeDS.icons.BeerIcon
 import ru.mikaeliv.beers.composeDS.theme.BeersTheme
 
 @Composable
@@ -50,7 +51,7 @@ fun RoundIconSurface(
 private fun RoundIconSurfacePreview() {
     BeersTheme {
         RoundIconSurface {
-            BeerMugIcon(modifier = Modifier.size(24.dp))
+            BeerIcon(size = 24.dp)
         }
     }
 }

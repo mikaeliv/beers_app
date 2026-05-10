@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import ru.mikaeliv.beers.composeDS.icons.BeerIcon
 import ru.mikaeliv.beers.composeDS.theme.BeersTheme
 
 @Composable
@@ -24,8 +25,8 @@ fun BeerLogo(
             .background(MaterialTheme.colorScheme.primaryContainer, CircleShape),
         contentAlignment = Alignment.Center
     ) {
-        BeerMugIcon(
-            modifier = Modifier.size(size * 0.44f),
+        BeerIcon(
+            size = size * 0.44f,
             tint = MaterialTheme.colorScheme.primary
         )
     }

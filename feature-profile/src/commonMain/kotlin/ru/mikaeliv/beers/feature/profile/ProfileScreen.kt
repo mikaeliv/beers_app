@@ -29,11 +29,11 @@ import beers.composeds.generated.resources.profile_settings
 import beers.composeds.generated.resources.profile_title
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import org.jetbrains.compose.resources.stringResource
-import ru.mikaeliv.beers.composeDS.components.BeerMugIcon
 import ru.mikaeliv.beers.composeDS.components.BeersButton
 import ru.mikaeliv.beers.composeDS.components.BeersTopAppBar
 import ru.mikaeliv.beers.composeDS.components.RoundIconSurface
 import ru.mikaeliv.beers.composeDS.components.StarRating
+import ru.mikaeliv.beers.composeDS.icons.BeerIcon
 import ru.mikaeliv.beers.composeDS.icons.LogoutIcon
 import ru.mikaeliv.beers.composeDS.icons.PersonIcon
 import ru.mikaeliv.beers.composeDS.icons.SettingsIcon
@@ -82,13 +82,13 @@ fun ProfileScreen(component: ProfileComponent) {
                     horizontalArrangement = Arrangement.spacedBy(18.dp)
                 ) {
                     StatCard("24", "Beers", modifier = Modifier.weight(1f)) {
-                        BeerMugIcon(modifier = Modifier.size(24.dp), tint = MaterialTheme.colorScheme.primary)
+                        BeerIcon(size = 24.dp, tint = MaterialTheme.colorScheme.primary)
                     }
                     StatCard("4.2", "Rating", modifier = Modifier.weight(1f)) {
                         StarRating(rating = 1, maxRating = 1, starSize = 24.dp)
                     }
                     StatCard("12", "Favorites", modifier = Modifier.weight(1f)) {
-                        BeerMugIcon(modifier = Modifier.size(24.dp), tint = MaterialTheme.colorScheme.primary)
+                        BeerIcon(size = 24.dp, tint = MaterialTheme.colorScheme.primary)
                     }
                 }
 
