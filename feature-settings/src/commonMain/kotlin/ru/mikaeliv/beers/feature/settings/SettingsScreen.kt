@@ -1,6 +1,5 @@
 package ru.mikaeliv.beers.feature.settings
 
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -25,9 +24,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
 import beers.composeds.generated.resources.Res
 import beers.composeds.generated.resources.settings_title
@@ -35,6 +32,9 @@ import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import org.jetbrains.compose.resources.stringResource
 import ru.mikaeliv.beers.composeDS.components.BeersTopAppBar
 import ru.mikaeliv.beers.composeDS.components.RoundIconSurface
+import ru.mikaeliv.beers.composeDS.icons.CheckIcon
+import ru.mikaeliv.beers.composeDS.icons.MoonIcon
+import ru.mikaeliv.beers.composeDS.icons.SunIcon
 
 @Composable
 fun SettingsScreen(component: SettingsComponent) {
@@ -79,7 +79,7 @@ fun SettingsScreen(component: SettingsComponent) {
                             modifier = Modifier.weight(1f),
                             onClick = { component.onDarkThemeToggle(false) }
                         ) {
-                            SunIcon(tint = MaterialTheme.colorScheme.primary)
+                            SunIcon(size = 30.dp, tint = MaterialTheme.colorScheme.primary)
                         }
                         ThemeOption(
                             title = "Dark",
@@ -87,7 +87,7 @@ fun SettingsScreen(component: SettingsComponent) {
                             modifier = Modifier.weight(1f),
                             onClick = { component.onDarkThemeToggle(true) }
                         ) {
-                            MoonIcon(tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                            MoonIcon(size = 30.dp, tint = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                     }
                 }
@@ -130,7 +130,7 @@ private fun ThemeOption(
                     .background(MaterialTheme.colorScheme.primary, CircleShape),
                 contentAlignment = Alignment.Center
             ) {
-                Text("v", color = MaterialTheme.colorScheme.onPrimary, style = MaterialTheme.typography.labelMedium)
+                CheckIcon(size = 16.dp, tint = MaterialTheme.colorScheme.onPrimary)
             }
         }
         Column(
@@ -145,39 +145,5 @@ private fun ThemeOption(
                 color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
-    }
-}
-
-@Composable
-private fun SunIcon(
-    modifier: Modifier = Modifier.size(30.dp),
-    tint: Color,
-) {
-    Canvas(modifier = modifier) {
-        drawCircle(tint, radius = size.minDimension * 0.18f, style = Stroke(size.minDimension * 0.08f))
-        val center = Offset(size.width / 2f, size.height / 2f)
-        val inner = size.minDimension * 0.32f
-        val outer = size.minDimension * 0.46f
-        repeat(8) { index ->
-            val angle = (index * 45.0 * kotlin.math.PI / 180.0)
-            drawLine(
-                color = tint,
-                start = Offset(center.x + kotlin.math.cos(angle).toFloat() * inner, center.y + kotlin.math.sin(angle).toFloat() * inner),
-                end = Offset(center.x + kotlin.math.cos(angle).toFloat() * outer, center.y + kotlin.math.sin(angle).toFloat() * outer),
-                strokeWidth = size.minDimension * 0.07f
-            )
-        }
-    }
-}
-
-@Composable
-private fun MoonIcon(
-    modifier: Modifier = Modifier.size(30.dp),
-    tint: Color,
-) {
-    val cutout = MaterialTheme.colorScheme.surfaceVariant
-    Canvas(modifier = modifier) {
-        drawCircle(tint, center = Offset(size.width * 0.45f, size.height * 0.5f), radius = size.minDimension * 0.32f, style = Stroke(size.minDimension * 0.08f))
-        drawCircle(cutout, center = Offset(size.width * 0.58f, size.height * 0.38f), radius = size.minDimension * 0.32f)
     }
 }
