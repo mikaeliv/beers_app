@@ -26,7 +26,7 @@ fun MainViewController() = ComposeUIViewController {
         }
     }
 
-    val repo = androidx.compose.runtime.produceState<ru.mikaeliv.beers.data.BeerRepository?>(initialValue = null) {
+    val repo = androidx.compose.runtime.produceState<ru.mikaeliv.beers.data.IBeerRepository?>(initialValue = null) {
         RepositoryProvider.provideRepository(DatabaseDriverFactory()) { value = it }
     }.value
     if (repo != null) {

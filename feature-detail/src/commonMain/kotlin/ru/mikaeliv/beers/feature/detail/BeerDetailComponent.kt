@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ru.mikaeliv.beers.core.Beer
 import ru.mikaeliv.beers.core.SyncActions
-import ru.mikaeliv.beers.data.BeerRepository
+import ru.mikaeliv.beers.data.IBeerRepository
 
 data class BeerDetailState(
     val isLoading: Boolean = true,
@@ -31,7 +31,7 @@ interface BeerDetailComponent {
 
 class DefaultBeerDetailComponent(
     componentContext: ComponentContext,
-    private val repo: BeerRepository,
+    private val repo: IBeerRepository,
     private val syncActions: SyncActions,
     private val beerId: Long,
     private val output: BeerDetailComponent.Output,

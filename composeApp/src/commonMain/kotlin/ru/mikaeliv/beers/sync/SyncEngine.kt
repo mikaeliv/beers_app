@@ -14,7 +14,7 @@ import ru.mikaeliv.beers.network.ApiResult
 import ru.mikaeliv.beers.network.connectivity.NetworkState
 import ru.mikaeliv.beers.core.SyncActions
 import ru.mikaeliv.beers.core.SyncStatus
-import ru.mikaeliv.beers.data.BeerRepository
+import ru.mikaeliv.beers.data.IBeerRepository
 import ru.mikaeliv.beers.network.api.BeerApi
 import ru.mikaeliv.beers.network.dto.BeerRequest
 
@@ -26,7 +26,7 @@ import ru.mikaeliv.beers.network.dto.BeerRequest
 private const val PAGE_SIZE = 20
 
 class SyncEngine(
-    private val repository: BeerRepository,
+    private val repository: IBeerRepository,
     private val beerApi: BeerApi = BeerApi(),
 ) : SyncActions {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)

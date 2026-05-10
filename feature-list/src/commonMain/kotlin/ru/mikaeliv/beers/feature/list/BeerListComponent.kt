@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ru.mikaeliv.beers.core.Beer
 import ru.mikaeliv.beers.core.SyncActions
-import ru.mikaeliv.beers.data.BeerRepository
+import ru.mikaeliv.beers.data.IBeerRepository
 
 interface BeerListComponent {
     /** Состояние: текущий список пив. */
@@ -48,7 +48,7 @@ interface BeerListComponent {
 
 class DefaultBeerListComponent(
     componentContext: ComponentContext,
-    private val repo: BeerRepository,
+    private val repo: IBeerRepository,
     private val syncEngine: SyncActions,
     private val output: BeerListComponent.Output,
 ) : BeerListComponent, ComponentContext by componentContext {

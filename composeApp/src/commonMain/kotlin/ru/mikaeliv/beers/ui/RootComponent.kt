@@ -33,7 +33,7 @@ import com.arkivanov.essenty.statekeeper.StateKeeper
 import com.arkivanov.essenty.instancekeeper.InstanceKeeper
 import com.arkivanov.essenty.backhandler.BackHandler
 import kotlinx.serialization.Serializable
-import ru.mikaeliv.beers.data.BeerRepository
+import ru.mikaeliv.beers.data.IBeerRepository
 import ru.mikaeliv.beers.feature.add.AddBeerComponent
 import ru.mikaeliv.beers.feature.add.AddBeerScreen
 import ru.mikaeliv.beers.feature.add.DefaultAddBeerComponent
@@ -104,7 +104,7 @@ sealed class Config {
 @OptIn(com.arkivanov.decompose.DelicateDecomposeApi::class)
 class DefaultRootComponent(
     componentContext: ComponentContext,
-    private val repo: BeerRepository,
+    private val repo: IBeerRepository,
     private val authApi: AuthApi = AuthApi(),
     private val tokenStorage: TokenStorage = TokenStorage(),
     private val syncEngine: SyncEngine,
@@ -226,7 +226,7 @@ fun RootUi(root: RootComponent) {
 @OptIn(com.arkivanov.decompose.DelicateDecomposeApi::class)
 @Composable
 fun rememberRootComponent(
-    repo: BeerRepository,
+    repo: IBeerRepository,
     syncEngine: SyncEngine,
     lifecycle: Lifecycle,
     stateKeeper: StateKeeper,

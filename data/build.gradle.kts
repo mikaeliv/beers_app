@@ -27,7 +27,10 @@ kotlin {
         jvmMain.dependencies { implementation(libs.sqldelight.jvm) }
         iosMain.dependencies { implementation(libs.sqldelight.ios) }
         // JS: временно без драйвера БД. Реализация DatabaseDriverFactory на JS бросает исключение.
-        commonTest.dependencies { implementation(libs.kotlin.test) }
+        commonTest.dependencies {
+            implementation(libs.kotlin.test)
+            implementation(libs.kotlinx.coroutines.test)
+        }
     }
 }
 
@@ -46,4 +49,3 @@ sqldelight {
         }
     }
 }
-

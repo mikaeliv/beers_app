@@ -3,6 +3,7 @@ package ru.mikaeliv.beers.feature.add
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.value.MutableValue
 import com.arkivanov.decompose.value.Value
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -11,7 +12,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.launch
 import ru.mikaeliv.beers.core.Beer
 import ru.mikaeliv.beers.core.SyncActions
-import ru.mikaeliv.beers.data.BeerRepository
+import ru.mikaeliv.beers.data.IBeerRepository
 
 /**
  * Состояние экрана добавления пива.
@@ -56,13 +57,14 @@ interface AddBeerComponent {
 
 class DefaultAddBeerComponent(
     componentContext: ComponentContext,
-    private val repo: BeerRepository,
+    private val repo: IBeerRepository,
     private val syncActions: SyncActions,
-    private val output: AddBeerComponent.Output
+    private val output: AddBeerComponent.Output,
+    private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate),
+    private val databaseDispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) : AddBeerComponent, ComponentContext by componentContext {
     // Навигация Decompose и обновление UI должны выполняться на main-потоке.
-    // Тяжёлые операции БД выполняем через withContext(Dispatchers.Default).
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
+    // Тяжёлые операции БД выполняем через dispatcher, который можно заменить в тестах.
     private val _state = MutableValue(AddBeerState())
     override val state: Value<AddBeerState> = _state
 
@@ -84,7 +86,7 @@ class DefaultAddBeerComponent(
         _state.value = s.copy(isSaving = true)
         scope.launch {
             // БД — в фоне
-            val localId = withContext(Dispatchers.Default) {
+            val localId = withContext(databaseDispatcher) {
                 repo.add(Beer(null, null, s.name, abv, s.comment.ifBlank { null }, s.rating, s.photoBytes))
             }
             // Запускаем фоновую синхронизацию с сервером

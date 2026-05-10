@@ -27,7 +27,7 @@ fun main() {
     ThemeState.init(SettingsStorage(null))
 
     ComposeViewport(document.body!!) {
-        val (repo, setRepo) = remember { mutableStateOf<ru.mikaeliv.beers.data.BeerRepository?>(null) }
+        val (repo, setRepo) = remember { mutableStateOf<ru.mikaeliv.beers.data.IBeerRepository?>(null) }
         LaunchedEffect(Unit) {
             RepositoryProvider.provideRepository(DatabaseDriverFactory()) { setRepo(it) }
         }

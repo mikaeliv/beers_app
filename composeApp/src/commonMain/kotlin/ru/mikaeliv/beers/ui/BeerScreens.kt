@@ -2,7 +2,7 @@ package ru.mikaeliv.beers.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import ru.mikaeliv.beers.data.BeerRepository
+import ru.mikaeliv.beers.data.IBeerRepository
 import com.arkivanov.essenty.backhandler.BackHandler
 import com.arkivanov.essenty.instancekeeper.InstanceKeeperDispatcher
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
@@ -15,7 +15,7 @@ import ru.mikaeliv.beers.sync.SyncEngine
  * Создает Essenty-хендлеры по умолчанию и строит RootComponent.
  */
 @Composable
-fun BeersApp(repo: BeerRepository) {
+fun BeersApp(repo: IBeerRepository) {
     val lifecycle = remember { LifecycleRegistry() }
     val stateKeeper = remember { StateKeeperDispatcher() }
     val instanceKeeper = remember { InstanceKeeperDispatcher() }
@@ -34,7 +34,7 @@ fun BeersApp(repo: BeerRepository) {
  */
 @Composable
 fun BeersAppWithContext(
-    repo: BeerRepository,
+    repo: IBeerRepository,
     lifecycle: com.arkivanov.essenty.lifecycle.Lifecycle,
     stateKeeper: com.arkivanov.essenty.statekeeper.StateKeeper,
     instanceKeeper: com.arkivanov.essenty.instancekeeper.InstanceKeeper,
