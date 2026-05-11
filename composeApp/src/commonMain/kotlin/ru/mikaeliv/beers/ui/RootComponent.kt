@@ -168,6 +168,7 @@ class DefaultRootComponent(
             DefaultProfileComponent(
                 ctx,
                 email = tokenStorage.getEmail() ?: "",
+                repo = repo,
                 authApi = authApi,
                 output = object : ProfileComponent.Output {
                     override fun back() { navigation.pop() }

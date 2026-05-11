@@ -5,8 +5,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -28,6 +30,7 @@ import beers.composeds.generated.resources.profile_logout
 import beers.composeds.generated.resources.profile_settings
 import beers.composeds.generated.resources.profile_title
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
+import kotlin.math.roundToInt
 import org.jetbrains.compose.resources.stringResource
 import ru.mikaeliv.beers.composeDS.components.BeersButton
 import ru.mikaeliv.beers.composeDS.components.BeersTopAppBar
@@ -79,17 +82,24 @@ fun ProfileScreen(component: ProfileComponent) {
 
                 Spacer(modifier = Modifier.height(58.dp))
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(IntrinsicSize.Min),
                     horizontalArrangement = Arrangement.spacedBy(18.dp)
                 ) {
-                    StatCard("24", "Beers", modifier = Modifier.weight(1f)) {
+                    StatCard(
+                        value = state.beerCount.toString(),
+                        label = "Beers",
+                        modifier = Modifier.weight(1f).fillMaxHeight()
+                    ) {
                         BeerIcon(size = 24.dp, tint = MaterialTheme.colorScheme.primary)
                     }
-                    StatCard("4.2", "Rating", modifier = Modifier.weight(1f)) {
+                    StatCard(
+                        value = state.averageRating.toString(),
+                        label = "Rating",
+                        modifier = Modifier.weight(1f).fillMaxHeight()
+                    ) {
                         StarRating(rating = 1, maxRating = 1, starSize = 24.dp)
-                    }
-                    StatCard("12", "Favorites", modifier = Modifier.weight(1f)) {
-                        BeerIcon(size = 24.dp, tint = MaterialTheme.colorScheme.primary)
                     }
                 }
 
@@ -119,7 +129,7 @@ private fun StatCard(
     icon: @Composable () -> Unit,
 ) {
     Surface(
-        modifier = modifier.height(142.dp),
+        modifier = modifier,
         shape = RoundedCornerShape(26.dp),
         color = MaterialTheme.colorScheme.surface,
         shadowElevation = 2.dp
