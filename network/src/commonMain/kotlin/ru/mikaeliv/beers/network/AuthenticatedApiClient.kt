@@ -15,7 +15,8 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
-import ru.mikaeliv.beers.network.auth.TokenStorage
+import ru.mikaeliv.beers.network.auth.DefaultTokenStorage
+import ru.mikaeliv.beers.network.auth.ITokenStorage
 import ru.mikaeliv.beers.network.dto.AuthResponse
 import ru.mikaeliv.beers.network.dto.RefreshRequest
 
@@ -26,7 +27,7 @@ import ru.mikaeliv.beers.network.dto.RefreshRequest
  */
 class AuthenticatedApiClient(
     @PublishedApi internal val httpClient: HttpClient = createHttpClient(),
-    @PublishedApi internal val tokenStorage: TokenStorage = TokenStorage(),
+    @PublishedApi internal val tokenStorage: ITokenStorage = DefaultTokenStorage(),
 ) {
     // Флаг для предотвращения бесконечного цикла обновления токенов
     @PublishedApi

@@ -2,7 +2,8 @@ package ru.mikaeliv.beers.network.api
 
 import ru.mikaeliv.beers.network.ApiClient
 import ru.mikaeliv.beers.network.ApiResult
-import ru.mikaeliv.beers.network.auth.TokenStorage
+import ru.mikaeliv.beers.network.auth.DefaultTokenStorage
+import ru.mikaeliv.beers.network.auth.ITokenStorage
 import ru.mikaeliv.beers.network.dto.AuthRequest
 import ru.mikaeliv.beers.network.dto.AuthResponse
 import ru.mikaeliv.beers.network.dto.RefreshRequest
@@ -20,7 +21,7 @@ interface IAuthApi {
 
 class AuthApi(
     private val apiClient: ApiClient = ApiClient(),
-    private val tokenStorage: TokenStorage = TokenStorage(),
+    private val tokenStorage: ITokenStorage = DefaultTokenStorage(),
 ) : IAuthApi {
     /**
      * Регистрация нового пользователя.

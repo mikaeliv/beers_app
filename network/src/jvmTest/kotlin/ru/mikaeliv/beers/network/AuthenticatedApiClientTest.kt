@@ -15,9 +15,8 @@ import io.ktor.http.headersOf
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
-import ru.mikaeliv.beers.network.auth.TokenStorage
+import ru.mikaeliv.beers.network.auth.ITokenStorage
 import ru.mikaeliv.beers.network.dto.AuthResponse
-import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -25,23 +24,14 @@ import kotlin.test.assertIs
 import kotlin.test.assertNull
 
 class AuthenticatedApiClientTest {
-    private lateinit var tokenStorage: TokenStorage
+    private lateinit var tokenStorage: InMemoryTokenStorage
 
     /**
-     * Перед каждым тестом очищает JVM Preferences, где TokenStorage хранит токены.
+     * Перед каждым тестом создает чистое in-memory хранилище токенов.
      */
     @BeforeTest
     fun setUp() {
-        tokenStorage = TokenStorage()
-        tokenStorage.clear()
-    }
-
-    /**
-     * После каждого теста очищает токены, чтобы сценарии не влияли друг на друга.
-     */
-    @AfterTest
-    fun tearDown() {
-        tokenStorage.clear()
+        tokenStorage = InMemoryTokenStorage()
     }
 
     /**
@@ -169,4 +159,36 @@ class AuthenticatedApiClientTest {
         status = HttpStatusCode.OK,
         headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString())
     )
+
+    private class InMemoryTokenStorage : ITokenStorage {
+        private var accessToken: String? = null
+        private var refreshToken: String? = null
+        private var email: String? = null
+
+        override fun saveAccessToken(token: String) {
+            accessToken = token
+        }
+
+        override fun getAccessToken(): String? = accessToken
+
+        override fun saveRefreshToken(token: String) {
+            refreshToken = token
+        }
+
+        override fun getRefreshToken(): String? = refreshToken
+
+        override fun saveEmail(email: String) {
+            this.email = email
+        }
+
+        override fun getEmail(): String? = email
+
+        override fun clear() {
+            accessToken = null
+            refreshToken = null
+            email = null
+        }
+
+        override fun isLoggedIn(): Boolean = accessToken != null
+    }
 }

@@ -55,7 +55,8 @@ import ru.mikaeliv.beers.feature.settings.SettingsScreen
 import ru.mikaeliv.beers.composeDS.OfflineBanner
 import ru.mikaeliv.beers.network.connectivity.NetworkState
 import ru.mikaeliv.beers.network.api.AuthApi
-import ru.mikaeliv.beers.network.auth.TokenStorage
+import ru.mikaeliv.beers.network.auth.DefaultTokenStorage
+import ru.mikaeliv.beers.network.auth.ITokenStorage
 import ru.mikaeliv.beers.sync.SyncEngine
 
 /**
@@ -106,7 +107,7 @@ class DefaultRootComponent(
     componentContext: ComponentContext,
     private val repo: IBeerRepository,
     private val authApi: AuthApi = AuthApi(),
-    private val tokenStorage: TokenStorage = TokenStorage(),
+    private val tokenStorage: ITokenStorage = DefaultTokenStorage(),
     private val syncEngine: SyncEngine,
 ) : RootComponent, ComponentContext by componentContext {
 
