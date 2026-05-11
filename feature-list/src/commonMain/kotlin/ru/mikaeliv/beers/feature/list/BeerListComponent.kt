@@ -51,10 +51,10 @@ class DefaultBeerListComponent(
     private val repo: IBeerRepository,
     private val syncEngine: SyncActions,
     private val output: BeerListComponent.Output,
+    private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate),
 ) : BeerListComponent, ComponentContext by componentContext {
 
     // Навигация и обновление UI — на main.
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private val _state = MutableValue<List<Beer>>(emptyList())
     override val state: Value<List<Beer>> = _state
     override val isRefreshing: StateFlow<Boolean> = syncEngine.isSyncing

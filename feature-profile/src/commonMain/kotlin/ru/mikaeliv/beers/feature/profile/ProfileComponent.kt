@@ -3,8 +3,7 @@ package ru.mikaeliv.beers.feature.profile
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.value.MutableValue
 import com.arkivanov.decompose.value.Value
-import ru.mikaeliv.beers.network.api.AuthApi
-import ru.mikaeliv.beers.network.auth.TokenStorage
+import ru.mikaeliv.beers.network.api.IAuthApi
 
 /**
  * Состояние экрана профиля.
@@ -30,7 +29,7 @@ interface ProfileComponent {
 class DefaultProfileComponent(
     componentContext: ComponentContext,
     private val email: String,
-    private val authApi: AuthApi,
+    private val authApi: IAuthApi,
     private val output: ProfileComponent.Output,
 ) : ProfileComponent, ComponentContext by componentContext {
 

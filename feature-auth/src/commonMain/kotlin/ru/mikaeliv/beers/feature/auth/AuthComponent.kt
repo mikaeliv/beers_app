@@ -3,13 +3,14 @@ package ru.mikaeliv.beers.feature.auth
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.value.MutableValue
 import com.arkivanov.decompose.value.Value
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import ru.mikaeliv.beers.network.api.AuthApi
+import ru.mikaeliv.beers.network.api.IAuthApi
 
 /**
  * Состояние экрана авторизации.
@@ -38,11 +39,12 @@ interface AuthComponent {
 
 class DefaultAuthComponent(
     componentContext: ComponentContext,
-    private val authApi: AuthApi,
+    private val authApi: IAuthApi,
     private val output: AuthComponent.Output,
+    private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate),
+    private val workDispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) : AuthComponent, ComponentContext by componentContext {
 
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private val _state = MutableValue(AuthState())
     override val state: Value<AuthState> = _state
 
@@ -71,7 +73,7 @@ class DefaultAuthComponent(
         _state.value = s.copy(isLoading = true, error = null)
 
         scope.launch {
-            val result = withContext(Dispatchers.Default) {
+            val result = withContext(workDispatcher) {
                 if (s.isLoginMode) {
                     authApi.login(s.email, s.password)
                 } else {

@@ -19,5 +19,8 @@ kotlin {
             implementation(libs.decompose.core)
             implementation(libs.decompose.extensions)
         }
+        commonTest.dependencies {
+            implementation(libs.kotlin.test)
+        }
     }
 }

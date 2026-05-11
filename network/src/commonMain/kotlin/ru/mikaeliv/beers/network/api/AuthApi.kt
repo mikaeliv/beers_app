@@ -10,10 +10,18 @@ import ru.mikaeliv.beers.network.dto.RefreshRequest
 /**
  * API для авторизации.
  */
+interface IAuthApi {
+    suspend fun register(email: String, password: String): ApiResult<AuthResponse>
+    suspend fun login(email: String, password: String): ApiResult<AuthResponse>
+    suspend fun refresh(): ApiResult<AuthResponse>
+    fun logout()
+    fun isLoggedIn(): Boolean
+}
+
 class AuthApi(
     private val apiClient: ApiClient = ApiClient(),
     private val tokenStorage: TokenStorage = TokenStorage(),
-) {
+) : IAuthApi {
     /**
      * Регистрация нового пользователя.
      *
@@ -21,7 +29,7 @@ class AuthApi(
      * @param password пароль
      * @return результат с токенами или ошибка
      */
-    suspend fun register(email: String, password: String): ApiResult<AuthResponse> {
+    override suspend fun register(email: String, password: String): ApiResult<AuthResponse> {
         val result = apiClient.post<AuthRequest, AuthResponse>(
             endpoint = "/auth/register",
             body = AuthRequest(email, password)
@@ -41,7 +49,7 @@ class AuthApi(
      * @param password пароль
      * @return результат с токенами или ошибка
      */
-    suspend fun login(email: String, password: String): ApiResult<AuthResponse> {
+    override suspend fun login(email: String, password: String): ApiResult<AuthResponse> {
         val result = apiClient.post<AuthRequest, AuthResponse>(
             endpoint = "/auth/login",
             body = AuthRequest(email, password)
@@ -59,7 +67,7 @@ class AuthApi(
      *
      * @return результат с новыми токенами или ошибка
      */
-    suspend fun refresh(): ApiResult<AuthResponse> {
+    override suspend fun refresh(): ApiResult<AuthResponse> {
         val refreshToken = tokenStorage.getRefreshToken()
             ?: return ApiResult.Error("No refresh token available")
 
@@ -77,12 +85,12 @@ class AuthApi(
     /**
      * Выход из аккаунта (очистка токенов).
      */
-    fun logout() {
+    override fun logout() {
         tokenStorage.clear()
     }
 
     /**
      * Проверяет, авторизован ли пользователь.
      */
-    fun isLoggedIn(): Boolean = tokenStorage.isLoggedIn()
+    override fun isLoggedIn(): Boolean = tokenStorage.isLoggedIn()
 }

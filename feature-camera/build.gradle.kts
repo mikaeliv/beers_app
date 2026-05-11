@@ -19,6 +19,9 @@ kotlin {
             implementation(compose.material3)
             implementation(compose.components.resources)
         }
+        commonTest.dependencies {
+            implementation(libs.kotlin.test)
+        }
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
