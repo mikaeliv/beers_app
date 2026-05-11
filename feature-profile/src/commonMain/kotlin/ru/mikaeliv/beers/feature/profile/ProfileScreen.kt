@@ -67,12 +67,7 @@ fun ProfileScreen(component: ProfileComponent) {
                 RoundIconSurface(size = 132.dp, selected = true) {
                     PersonIcon(size = 62.dp, tint = MaterialTheme.colorScheme.primary)
                 }
-                Spacer(modifier = Modifier.height(30.dp))
-                Text(
-                    text = "Beer Enthusiast",
-                    style = MaterialTheme.typography.headlineSmall,
-                    color = MaterialTheme.colorScheme.onBackground,
-                )
+                Spacer(modifier = Modifier.height(15.dp))
                 Text(
                     text = state.email,
                     style = MaterialTheme.typography.titleSmall,
