@@ -1,6 +1,7 @@
 package ru.mikaeliv.beers.sync
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,6 +17,7 @@ import ru.mikaeliv.beers.core.SyncActions
 import ru.mikaeliv.beers.core.SyncStatus
 import ru.mikaeliv.beers.data.IBeerRepository
 import ru.mikaeliv.beers.network.api.BeerApi
+import ru.mikaeliv.beers.network.api.IBeerApi
 import ru.mikaeliv.beers.network.dto.BeerRequest
 
 /**
@@ -27,10 +29,16 @@ private const val PAGE_SIZE = 20
 
 class SyncEngine(
     private val repository: IBeerRepository,
-    private val beerApi: BeerApi = BeerApi(),
+    private val beerApi: IBeerApi = BeerApi(),
+    private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate),
+    private val workDispatcher: CoroutineDispatcher = Dispatchers.Default,
+    private val observeOnlineChanges: Boolean = NetworkState.isInitialized,
+    onlineState: StateFlow<Boolean> = if (NetworkState.isInitialized) {
+        NetworkState.isOnline
+    } else {
+        MutableStateFlow(true)
+    },
 ) : SyncActions {
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
-    
     private val _isSyncing = MutableStateFlow(false)
     override val isSyncing: StateFlow<Boolean> = _isSyncing.asStateFlow()
 
@@ -47,14 +55,13 @@ class SyncEngine(
     private var lastLoadedPage = -1
     
     /** Состояние сети (online/offline). */
-    val isOnline: StateFlow<Boolean>
-        get() = if (NetworkState.isInitialized) NetworkState.isOnline else MutableStateFlow(true)
+    val isOnline: StateFlow<Boolean> = onlineState
 
     init {
         // Подписываемся на изменения состояния сети
         scope.launch {
-            if (NetworkState.isInitialized) {
-                NetworkState.isOnline.collectLatest { online ->
+            if (observeOnlineChanges) {
+                isOnline.collectLatest { online ->
                     if (online) {
                         // При восстановлении соединения — синхронизируем
                         syncPendingChanges()
@@ -82,7 +89,7 @@ class SyncEngine(
                 _lastError.value = null
 
                 try {
-                    withContext(Dispatchers.Default) {
+                    withContext(workDispatcher) {
                         pushToServer()
                         pullFromServer(fetchAllPages = true)
                     }
@@ -115,7 +122,7 @@ class SyncEngine(
                 _lastError.value = null
 
                 try {
-                    withContext(Dispatchers.Default) {
+                    withContext(workDispatcher) {
                         pullFromServer(fetchAllPages = false)
                     }
                 } catch (e: Exception) {
@@ -142,7 +149,7 @@ class SyncEngine(
             _lastError.value = null
             
             try {
-                withContext(Dispatchers.Default) {
+                withContext(workDispatcher) {
                     val nextPage = lastLoadedPage + 1
                     val result = beerApi.getBeers(page = nextPage, size = PAGE_SIZE)
                     
@@ -184,7 +191,7 @@ class SyncEngine(
         if (!isOnline.value) return // Offline — синхронизируется позже
         
         scope.launch {
-            withContext(Dispatchers.Default) {
+            withContext(workDispatcher) {
                 val beer = repository.getById(localId) ?: return@withContext
                 if (beer.syncStatus != SyncStatus.PENDING_CREATE) return@withContext
 
@@ -226,7 +233,7 @@ class SyncEngine(
         if (!isOnline.value) return // Offline — синхронизируется позже
         
         scope.launch {
-            withContext(Dispatchers.Default) {
+            withContext(workDispatcher) {
                 val beer = repository.getById(localId) ?: return@withContext
                 if (beer.syncStatus != SyncStatus.PENDING_DELETE) return@withContext
 
@@ -261,7 +268,7 @@ class SyncEngine(
                 _lastError.value = null
 
                 try {
-                    withContext(Dispatchers.Default) {
+                    withContext(workDispatcher) {
                         pushToServer()
                     }
                 } catch (e: Exception) {

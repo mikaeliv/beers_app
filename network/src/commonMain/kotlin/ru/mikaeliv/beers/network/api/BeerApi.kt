@@ -17,9 +17,17 @@ import ru.mikaeliv.beers.network.dto.BeersPageResponse
  * API для работы с пивом.
  * Все запросы требуют авторизации.
  */
+interface IBeerApi {
+    suspend fun getBeers(page: Int = 0, size: Int = 20): ApiResult<BeersPageResponse>
+    suspend fun addBeer(request: BeerRequest, imageBytes: ByteArray): ApiResult<BeerResponse>
+    suspend fun updateBeer(request: BeerRequest, imageBytes: ByteArray? = null): ApiResult<BeerResponse>
+    suspend fun getBeerImage(imageUrl: String): ApiResult<ByteArray>
+    suspend fun deleteBeer(id: String): ApiResult<Unit>
+}
+
 class BeerApi(
     private val apiClient: AuthenticatedApiClient = AuthenticatedApiClient(),
-) {
+) : IBeerApi {
     private val json = Json {
         ignoreUnknownKeys = true
         encodeDefaults = true
@@ -32,7 +40,7 @@ class BeerApi(
      * @param size размер страницы
      * @return результат с пагинированным ответом (content, page) или ошибка
      */
-    suspend fun getBeers(page: Int = 0, size: Int = 20): ApiResult<BeersPageResponse> =
+    override suspend fun getBeers(page: Int, size: Int): ApiResult<BeersPageResponse> =
         apiClient.get("/beers?page=$page&size=$size")
 
     /**
@@ -99,13 +107,13 @@ class BeerApi(
         return "$sanitizedName-beer-image.jpg"
     }
 
-    suspend fun addBeer(request: BeerRequest, imageBytes: ByteArray): ApiResult<BeerResponse> =
+    override suspend fun addBeer(request: BeerRequest, imageBytes: ByteArray): ApiResult<BeerResponse> =
         saveBeer(request = request.copy(id = null), imageBytes = imageBytes)
 
-    suspend fun updateBeer(request: BeerRequest, imageBytes: ByteArray? = null): ApiResult<BeerResponse> =
+    override suspend fun updateBeer(request: BeerRequest, imageBytes: ByteArray?): ApiResult<BeerResponse> =
         saveBeer(request = request, imageBytes = imageBytes)
 
-    suspend fun getBeerImage(imageUrl: String): ApiResult<ByteArray> =
+    override suspend fun getBeerImage(imageUrl: String): ApiResult<ByteArray> =
         apiClient.get(imageUrl)
 
     /**
@@ -114,6 +122,6 @@ class BeerApi(
      * @param id идентификатор пива
      * @return результат успеха или ошибка
      */
-    suspend fun deleteBeer(id: String): ApiResult<Unit> =
+    override suspend fun deleteBeer(id: String): ApiResult<Unit> =
         apiClient.deleteUnit("/beers/$id")
 }
