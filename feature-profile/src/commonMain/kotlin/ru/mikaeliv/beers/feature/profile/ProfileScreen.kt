@@ -34,6 +34,7 @@ import ru.mikaeliv.beers.composeDS.components.BeersTopAppBar
 import ru.mikaeliv.beers.composeDS.components.RoundIconSurface
 import ru.mikaeliv.beers.composeDS.components.StarRating
 import ru.mikaeliv.beers.composeDS.icons.BeerIcon
+import ru.mikaeliv.beers.composeDS.icons.ChevronRightIcon
 import ru.mikaeliv.beers.composeDS.icons.LogoutIcon
 import ru.mikaeliv.beers.composeDS.icons.PersonIcon
 import ru.mikaeliv.beers.composeDS.icons.SettingsIcon
@@ -160,7 +161,7 @@ private fun SettingsRow(onClick: () -> Unit) {
                 color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.weight(1f).padding(start = 22.dp)
             )
-            Text(">", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            ChevronRightIcon(size = 35.dp, tint = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }

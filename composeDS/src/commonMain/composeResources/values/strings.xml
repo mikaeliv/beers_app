@@ -53,6 +53,7 @@
     <string name="icon_back">Назад</string>
     <string name="icon_beer">Пиво</string>
     <string name="icon_check">Выбрано</string>
+    <string name="icon_chevron_right">Вперед</string>
     <string name="icon_moon">Темная тема</string>
     <string name="icon_settings">Настройки</string>
     <string name="icon_sun">Светлая тема</string>
