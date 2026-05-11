@@ -1,76 +1,129 @@
-This is a Kotlin Multiplatform project targeting Android, iOS, Web, Desktop (JVM).
+# Beers
 
-* [/composeApp](./composeApp/src) is for code that will be shared across your Compose Multiplatform applications.
-  It contains several subfolders:
-  - [commonMain](./composeApp/src/commonMain/kotlin) is for code that’s common for all targets.
-  - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name.
-    For example, if you want to use Apple’s CoreCrypto for the iOS part of your Kotlin app,
-    the [iosMain](./composeApp/src/iosMain/kotlin) folder would be the right place for such calls.
-    Similarly, if you want to edit the Desktop (JVM) specific part, the [jvmMain](./composeApp/src/jvmMain/kotlin)
-    folder is the appropriate location.
+Beers is a Kotlin Multiplatform application for keeping a personal beer journal. The app lets a user sign in, add beers with photos, ABV, comments and ratings, browse the collection, open beer details, manage profile/settings and keep local data synchronized with a backend.
 
-* [/iosApp](./iosApp/iosApp) contains iOS applications. Even if you’re sharing your UI with Compose Multiplatform,
-  you need this entry point for your iOS app. This is also where you should add SwiftUI code for your project.
+The project is built around Compose Multiplatform and an offline-first data flow: beers are stored locally with SQLDelight, marked with sync statuses, and synchronized with the server when the network is available.
 
-### Build and Run Android Application
+## Features
 
-To build and run the development version of the Android app, use the run configuration from the run widget
-in your IDE’s toolbar or build it directly from the terminal:
-- on macOS/Linux
-  ```shell
-  ./gradlew :composeApp:assembleDebug
-  ```
-- on Windows
-  ```shell
-  .\gradlew.bat :composeApp:assembleDebug
-  ```
+- Email/password authentication with access and refresh token storage.
+- Beer list, detail screen and add-beer flow.
+- Photo support through platform-specific camera/image picker implementations.
+- Rating, ABV and comment fields for each beer.
+- Offline-first local storage with pending create/delete sync states.
+- Pull/push synchronization with a backend API.
+- Offline banner based on network connectivity state.
+- Profile and settings screens.
+- Shared UI components and theme in a dedicated design-system module.
 
-### Build and Run Desktop (JVM) Application
+## Tech Stack
 
-To build and run the development version of the desktop app, use the run configuration from the run widget
-in your IDE’s toolbar or run it directly from the terminal:
-- on macOS/Linux
-  ```shell
-  ./gradlew :composeApp:run
-  ```
-- on Windows
-  ```shell
-  .\gradlew.bat :composeApp:run
-  ```
+- Kotlin Multiplatform
+- Compose Multiplatform
+- Decompose for navigation and component lifecycle
+- SQLDelight for local persistence
+- Ktor Client for networking
+- kotlinx.serialization for JSON
+- Kotlin Coroutines and Flow
+- AndroidX Camera on Android
+- Gradle version catalogs
 
-### Build and Run Web Application
+## Project Structure
 
-To build and run the development version of the web app, use the run configuration from the run widget
-in your IDE's toolbar or run it directly from the terminal:
-- for the Wasm target (faster, modern browsers):
-  - on macOS/Linux
-    ```shell
-    ./gradlew :composeApp:wasmJsBrowserDevelopmentRun
-    ```
-  - on Windows
-    ```shell
-    .\gradlew.bat :composeApp:wasmJsBrowserDevelopmentRun
-    ```
-- for the JS target (slower, supports older browsers):
-  - on macOS/Linux
-    ```shell
-    ./gradlew :composeApp:jsBrowserDevelopmentRun
-    ```
-  - on Windows
-    ```shell
-    .\gradlew.bat :composeApp:jsBrowserDevelopmentRun
-    ```
+```text
+.
+├── composeApp/        # Application entry point and root navigation for Android, Desktop, iOS and JS
+├── composeDS/         # Shared design system: theme, icons, reusable Compose components
+├── core/              # Domain models and shared contracts
+├── data/              # SQLDelight database, drivers and beer repository
+├── network/           # Ktor clients, auth API, beer API, token storage, connectivity
+├── feature-auth/      # Login and registration feature
+├── feature-list/      # Beer list feature
+├── feature-detail/    # Beer detail feature
+├── feature-add/       # Add beer feature
+├── feature-camera/    # Camera preview and availability abstractions
+├── feature-profile/   # Profile screen and logout flow
+├── feature-settings/  # App settings screen
+└── iosApp/            # Native iOS SwiftUI host app
+```
 
-### Build and Run iOS Application
+## Requirements
 
-To build and run the development version of the iOS app, use the run configuration from the run widget
-in your IDE’s toolbar or open the [/iosApp](./iosApp) directory in Xcode and run it from there.
+- JDK 11 or newer
+- Android Studio or IntelliJ IDEA with Kotlin Multiplatform support
+- Android SDK for Android builds
+- Xcode for iOS builds
+- A backend API running on port `8085`
 
----
+Default API base URLs:
 
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html),
-[Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform/#compose-multiplatform),
-[Kotlin/Wasm](https://kotl.in/wasm/)…
+- Android emulator: `http://10.0.2.2:8085`
+- Desktop, iOS simulator and Web: `http://localhost:8085`
 
-We would appreciate your feedback on Compose/Web and Kotlin/Wasm in the public Slack channel [#compose-web](https://slack-chats.kotlinlang.org/c/compose-web).
-If you face any issues, please report them on [YouTrack](https://youtrack.jetbrains.com/newIssue?project=CMP).
+## Run
+
+### Desktop
+
+```shell
+./gradlew :composeApp:run
+```
+
+### Android
+
+```shell
+./gradlew :composeApp:assembleDebug
+```
+
+Then install or run the generated debug build from Android Studio.
+
+### Web JS
+
+```shell
+./gradlew :composeApp:jsBrowserDevelopmentRun
+```
+
+Note: the JS target is present, but the SQLDelight JS database driver is currently not wired in; the JS database factory is a placeholder.
+
+### iOS
+
+Open `iosApp` in Xcode and run the app from there.
+
+Gradle iOS targets in `composeApp` are opt-in so that `./gradlew build` can run on machines without Xcode:
+
+```shell
+./gradlew :composeApp:build -PenableIos=true
+```
+
+## Test
+
+Run all available tests:
+
+```shell
+./gradlew test
+```
+
+Run tests for a specific module:
+
+```shell
+./gradlew :data:jvmTest
+./gradlew :network:jvmTest
+./gradlew :composeApp:jvmTest
+```
+
+## Build
+
+Build the whole project:
+
+```shell
+./gradlew build
+```
+
+Build desktop distributions:
+
+```shell
+./gradlew :composeApp:packageDistributionForCurrentOS
+```
+
+The desktop module is configured to produce DMG, MSI and DEB packages depending on the current host OS.
+
+##
