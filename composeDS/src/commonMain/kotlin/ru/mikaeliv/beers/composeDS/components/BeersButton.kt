@@ -42,7 +42,7 @@ fun BeersButton(
             disabledContainerColor = containerColor.copy(alpha = 0.5f),
             disabledContentColor = contentColor.copy(alpha = 0.7f)
         ),
-        elevation = ButtonDefaults.buttonElevation(defaultElevation = 3.dp)
+        elevation = null
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             if (leadingIcon != null) {
