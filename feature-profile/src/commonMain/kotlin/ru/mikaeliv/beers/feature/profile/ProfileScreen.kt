@@ -70,7 +70,7 @@ fun ProfileScreen(component: ProfileComponent) {
                     color = MaterialTheme.colorScheme.onBackground,
                 )
                 Text(
-                    text = state.email.ifBlank { "@beermaster" },
+                    text = state.email,
                     style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(top = 8.dp)
@@ -121,7 +121,7 @@ private fun StatCard(
         modifier = modifier.height(142.dp),
         shape = RoundedCornerShape(26.dp),
         color = MaterialTheme.colorScheme.surface,
-        shadowElevation = 6.dp
+        shadowElevation = 2.dp
     ) {
         Column(
             modifier = Modifier.fillMaxSize().padding(14.dp),
@@ -145,7 +145,7 @@ private fun SettingsRow(onClick: () -> Unit) {
             .clickable(interactionSource = interactionSource, indication = null, onClick = onClick),
         shape = RoundedCornerShape(26.dp),
         color = MaterialTheme.colorScheme.surface,
-        shadowElevation = 6.dp
+        shadowElevation = 2.dp
     ) {
         Row(
             modifier = Modifier.fillMaxSize().padding(horizontal = 28.dp),
