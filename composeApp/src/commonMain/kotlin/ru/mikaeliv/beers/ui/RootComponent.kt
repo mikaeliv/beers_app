@@ -33,6 +33,7 @@ import com.arkivanov.essenty.statekeeper.StateKeeper
 import com.arkivanov.essenty.instancekeeper.InstanceKeeper
 import com.arkivanov.essenty.backhandler.BackHandler
 import kotlinx.serialization.Serializable
+import ru.mikaeliv.beers.core.SyncActions
 import ru.mikaeliv.beers.data.IBeerRepository
 import ru.mikaeliv.beers.feature.add.AddBeerComponent
 import ru.mikaeliv.beers.feature.add.AddBeerScreen
@@ -55,6 +56,7 @@ import ru.mikaeliv.beers.feature.settings.SettingsScreen
 import ru.mikaeliv.beers.composeDS.OfflineBanner
 import ru.mikaeliv.beers.network.connectivity.NetworkState
 import ru.mikaeliv.beers.network.api.AuthApi
+import ru.mikaeliv.beers.network.api.IAuthApi
 import ru.mikaeliv.beers.network.auth.DefaultTokenStorage
 import ru.mikaeliv.beers.network.auth.ITokenStorage
 import ru.mikaeliv.beers.sync.SyncEngine
@@ -106,9 +108,9 @@ sealed class Config {
 class DefaultRootComponent(
     componentContext: ComponentContext,
     private val repo: IBeerRepository,
-    private val authApi: AuthApi = AuthApi(),
+    private val authApi: IAuthApi = AuthApi(),
     private val tokenStorage: ITokenStorage = DefaultTokenStorage(),
-    private val syncEngine: SyncEngine,
+    private val syncEngine: SyncActions,
 ) : RootComponent, ComponentContext by componentContext {
 
     private val navigation = StackNavigation<Config>()

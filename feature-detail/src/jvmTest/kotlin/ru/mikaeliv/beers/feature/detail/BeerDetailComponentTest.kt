@@ -2,6 +2,7 @@ package ru.mikaeliv.beers.feature.detail
 
 import com.arkivanov.decompose.DefaultComponentContext
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -20,6 +21,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class BeerDetailComponentTest {
@@ -95,9 +97,31 @@ class BeerDetailComponentTest {
         assertEquals(0, fixture.output.backCalls)
     }
 
-    private fun TestScope.createFixture(beer: Beer?): Fixture {
+    /**
+     * Проверяет, что onDestroy отменяет незавершенную загрузку и не обновляет state после отмены.
+     */
+    @Test
+    fun onDestroyCancelsPendingLoad() = runTest {
+        val pendingBeer = CompletableDeferred<Beer?>()
+        val repository = FakeBeerRepository { pendingBeer.await() }
+        val fixture = createFixture(repository = repository)
+
+        advanceUntilIdle()
+        assertEquals(listOf(10L), fixture.repository.getByIdCalls)
+
+        fixture.component.onDestroy()
+        pendingBeer.complete(beer(id = 10L))
+        advanceUntilIdle()
+
+        assertTrue(fixture.component.state.value.isLoading)
+        assertNull(fixture.component.state.value.beer)
+    }
+
+    private fun TestScope.createFixture(
+        beer: Beer? = null,
+        repository: FakeBeerRepository = FakeBeerRepository(beer),
+    ): Fixture {
         val dispatcher = StandardTestDispatcher(testScheduler)
-        val repository = FakeBeerRepository(beer)
         val syncActions = FakeSyncActions()
         val output = FakeOutput()
         val component = DefaultBeerDetailComponent(
@@ -119,14 +143,18 @@ class BeerDetailComponentTest {
         val output: FakeOutput,
     )
 
-    private class FakeBeerRepository(private val beer: Beer?) : IBeerRepository {
+    private class FakeBeerRepository(
+        private val getByIdResult: suspend (Long) -> Beer?,
+    ) : IBeerRepository {
+        constructor(beer: Beer?) : this({ beer })
+
         val getByIdCalls = mutableListOf<Long>()
         val deleteCalls = mutableListOf<Long>()
 
         override fun getAll(): Flow<List<Beer>> = MutableStateFlow(emptyList())
         override suspend fun getById(id: Long): Beer? {
             getByIdCalls += id
-            return beer
+            return getByIdResult(id)
         }
         override suspend fun getByServerId(serverId: String): Beer? = null
         override suspend fun add(beer: Beer): Long = 0L

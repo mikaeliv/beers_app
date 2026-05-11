@@ -2,6 +2,7 @@ package ru.mikaeliv.beers.feature.add
 
 import com.arkivanov.decompose.DefaultComponentContext
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -156,9 +157,36 @@ class AddBeerComponentTest {
         assertNull(fixture.repository.addedBeers.single().comment)
     }
 
-    private fun TestScope.createFixture(nextBeerId: Long = 1L): Fixture {
+    /**
+     * Проверяет, что onDestroy отменяет незавершенное сохранение и не дает вызвать sync/output после отмены.
+     */
+    @Test
+    fun onDestroyCancelsPendingSave() = runTest {
+        val pendingId = CompletableDeferred<Long>()
+        val fixture = createFixture(addResult = { pendingId.await() })
+        fixture.component.onNameChange("Sour")
+        fixture.component.onAbvChange("4.5")
+        fixture.component.onPhotoSelected(byteArrayOf(4, 5, 6))
+
+        fixture.component.onSave()
+        advanceUntilIdle()
+        assertTrue(fixture.component.state.value.isSaving)
+        assertEquals(1, fixture.repository.addedBeers.size)
+
+        fixture.component.onDestroy()
+        pendingId.complete(99L)
+        advanceUntilIdle()
+
+        assertTrue(fixture.syncActions.syncCreateIds.isEmpty())
+        assertEquals(0, fixture.output.savedCalls)
+    }
+
+    private fun TestScope.createFixture(
+        nextBeerId: Long = 1L,
+        addResult: (suspend (Beer) -> Long)? = null,
+    ): Fixture {
         val dispatcher = StandardTestDispatcher(testScheduler)
-        val repository = FakeBeerRepository(nextBeerId)
+        val repository = FakeBeerRepository(nextBeerId, addResult)
         val syncActions = FakeSyncActions()
         val output = FakeOutput()
         val component = DefaultAddBeerComponent(
@@ -188,7 +216,10 @@ class AddBeerComponentTest {
         val output: FakeOutput,
     )
 
-    private class FakeBeerRepository(private val nextBeerId: Long) : IBeerRepository {
+    private class FakeBeerRepository(
+        private val nextBeerId: Long,
+        private val addResult: (suspend (Beer) -> Long)? = null,
+    ) : IBeerRepository {
         val addedBeers = mutableListOf<Beer>()
         private val beers = MutableStateFlow<List<Beer>>(emptyList())
 
@@ -200,7 +231,7 @@ class AddBeerComponentTest {
 
         override suspend fun add(beer: Beer): Long {
             addedBeers += beer
-            return nextBeerId
+            return addResult?.invoke(beer) ?: nextBeerId
         }
 
         override suspend fun insertFromServer(

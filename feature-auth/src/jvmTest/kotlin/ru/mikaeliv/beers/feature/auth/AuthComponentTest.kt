@@ -2,6 +2,7 @@ package ru.mikaeliv.beers.feature.auth
 
 import com.arkivanov.decompose.DefaultComponentContext
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -134,11 +135,33 @@ class AuthComponentTest {
         assertEquals(0, fixture.output.successCalls)
     }
 
+    /**
+     * Проверяет, что onDestroy отменяет незавершенный submit и не пропускает onAuthSuccess после отмены.
+     */
+    @Test
+    fun onDestroyCancelsPendingSubmit() = runTest {
+        val pendingResult = CompletableDeferred<ApiResult<AuthResponse>>()
+        val fixture = createFixture(authApi = FakeAuthApi { pendingResult.await() })
+        fixture.component.onEmailChange("user@example.com")
+        fixture.component.onPasswordChange("secret")
+
+        fixture.component.onSubmit()
+        advanceUntilIdle()
+        assertTrue(fixture.component.state.value.isLoading)
+        assertEquals(1, fixture.authApi.loginCalls)
+
+        fixture.component.onDestroy()
+        pendingResult.complete(ApiResult.Success(AuthResponse("access", "refresh")))
+        advanceUntilIdle()
+
+        assertEquals(0, fixture.output.successCalls)
+    }
+
     private fun TestScope.createFixture(
         result: ApiResult<AuthResponse> = ApiResult.Success(AuthResponse("access", "refresh")),
+        authApi: FakeAuthApi = FakeAuthApi(result),
     ): Fixture {
         val dispatcher = StandardTestDispatcher(testScheduler)
-        val authApi = FakeAuthApi(result)
         val output = FakeOutput()
         val component = DefaultAuthComponent(
             componentContext = DefaultComponentContext(LifecycleRegistry()),
@@ -156,22 +179,26 @@ class AuthComponentTest {
         val output: FakeOutput,
     )
 
-    private class FakeAuthApi(private val result: ApiResult<AuthResponse>) : IAuthApi {
+    private class FakeAuthApi(
+        private val resultProvider: suspend () -> ApiResult<AuthResponse>,
+    ) : IAuthApi {
+        constructor(result: ApiResult<AuthResponse>) : this({ result })
+
         var loginCalls = 0
         var registerCalls = 0
         var logoutCalls = 0
 
         override suspend fun register(email: String, password: String): ApiResult<AuthResponse> {
             registerCalls += 1
-            return result
+            return resultProvider()
         }
 
         override suspend fun login(email: String, password: String): ApiResult<AuthResponse> {
             loginCalls += 1
-            return result
+            return resultProvider()
         }
 
-        override suspend fun refresh(): ApiResult<AuthResponse> = result
+        override suspend fun refresh(): ApiResult<AuthResponse> = resultProvider()
 
         override fun logout() {
             logoutCalls += 1

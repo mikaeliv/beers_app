@@ -83,6 +83,26 @@ class BeerListComponentTest {
         assertEquals(true, fixture.component.isLoadingMore.value)
     }
 
+    /**
+     * Проверяет, что onDestroy отменяет подписку на репозиторий и новые emission уже не меняют state.
+     */
+    @Test
+    fun onDestroyStopsCollectingRepository() = runTest {
+        val fixture = createFixture()
+        val firstBeers = listOf(beer(1L))
+        val secondBeers = listOf(beer(2L))
+
+        fixture.repository.emit(firstBeers)
+        advanceUntilIdle()
+        assertEquals(firstBeers, fixture.component.state.value)
+
+        fixture.component.onDestroy()
+        fixture.repository.emit(secondBeers)
+        advanceUntilIdle()
+
+        assertEquals(firstBeers, fixture.component.state.value)
+    }
+
     private fun TestScope.createFixture(): Fixture {
         val dispatcher = StandardTestDispatcher(testScheduler)
         val repository = FakeBeerRepository()
