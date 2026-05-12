@@ -17,4 +17,13 @@ actual class SettingsStorage actual constructor(context: Any?) {
         defaults.setBool(value, key)
         defaults.synchronize()
     }
+
+    actual fun getString(key: String, defaultValue: String): String {
+        return defaults.stringForKey(key) ?: defaultValue
+    }
+
+    actual fun putString(key: String, value: String) {
+        defaults.setObject(value, key)
+        defaults.synchronize()
+    }
 }

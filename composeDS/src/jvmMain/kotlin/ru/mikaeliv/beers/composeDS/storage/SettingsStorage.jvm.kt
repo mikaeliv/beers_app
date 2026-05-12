@@ -13,4 +13,13 @@ actual class SettingsStorage actual constructor(context: Any?) {
         prefs.putBoolean(key, value)
         prefs.flush()
     }
+
+    actual fun getString(key: String, defaultValue: String): String {
+        return prefs.get(key, defaultValue)
+    }
+
+    actual fun putString(key: String, value: String) {
+        prefs.put(key, value)
+        prefs.flush()
+    }
 }

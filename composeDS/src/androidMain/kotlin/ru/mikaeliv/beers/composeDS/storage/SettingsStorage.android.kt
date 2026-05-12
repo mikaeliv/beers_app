@@ -16,4 +16,12 @@ actual class SettingsStorage actual constructor(context: Any?) {
     actual fun putBoolean(key: String, value: Boolean) {
         prefs.edit().putBoolean(key, value).apply()
     }
+
+    actual fun getString(key: String, defaultValue: String): String {
+        return prefs.getString(key, defaultValue) ?: defaultValue
+    }
+
+    actual fun putString(key: String, value: String) {
+        prefs.edit().putString(key, value).apply()
+    }
 }

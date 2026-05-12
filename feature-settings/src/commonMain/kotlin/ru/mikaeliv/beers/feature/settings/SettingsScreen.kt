@@ -42,6 +42,7 @@ import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import org.jetbrains.compose.resources.stringResource
 import ru.mikaeliv.beers.composeDS.components.BeersTopAppBar
 import ru.mikaeliv.beers.composeDS.components.RoundIconSurface
+import ru.mikaeliv.beers.composeDS.language.AppLanguage
 import ru.mikaeliv.beers.composeDS.icons.CheckIcon
 import ru.mikaeliv.beers.composeDS.icons.MoonIcon
 import ru.mikaeliv.beers.composeDS.icons.SunIcon
@@ -90,10 +91,12 @@ fun SettingsScreen(component: SettingsComponent) {
                     SettingsSectionTitle(stringResource(Res.string.settings_language))
                     Spacer(modifier = Modifier.height(24.dp))
                     SettingsSwitch(
-                        isFirst = true,
+                        isFirst = state.language == AppLanguage.English,
                         firstTitle = stringResource(Res.string.settings_language_english),
                         secondTitle = stringResource(Res.string.settings_language_russian),
-                        onToggle = {}
+                        onToggle = { isFirst ->
+                            component.onLanguageChange(if (isFirst) AppLanguage.English else AppLanguage.Russian)
+                        }
                     )
                 }
 

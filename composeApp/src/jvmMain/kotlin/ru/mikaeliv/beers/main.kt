@@ -15,6 +15,7 @@ import com.arkivanov.essenty.statekeeper.StateKeeperDispatcher
 import com.arkivanov.essenty.instancekeeper.InstanceKeeperDispatcher
 import com.arkivanov.essenty.backhandler.BackDispatcher
 import ru.mikaeliv.beers.composeDS.storage.SettingsStorage
+import ru.mikaeliv.beers.composeDS.language.LanguageState
 import ru.mikaeliv.beers.composeDS.theme.ThemeState
 import ru.mikaeliv.beers.network.connectivity.NetworkState
 import ru.mikaeliv.beers.network.connectivity.createNetworkMonitor
@@ -25,7 +26,9 @@ fun main() {
     NetworkState.init(createNetworkMonitor())
     
     // Инициализируем тему из сохраненных настроек
-    ThemeState.init(SettingsStorage(null))
+    val settingsStorage = SettingsStorage(null)
+    ThemeState.init(settingsStorage)
+    LanguageState.init(settingsStorage)
 
     application {
         val (windowTitle, setWindowTitle) = remember { mutableStateOf("") }

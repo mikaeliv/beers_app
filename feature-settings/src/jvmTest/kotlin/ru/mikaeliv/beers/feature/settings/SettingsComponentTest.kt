@@ -2,6 +2,8 @@ package ru.mikaeliv.beers.feature.settings
 
 import com.arkivanov.decompose.DefaultComponentContext
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
+import ru.mikaeliv.beers.composeDS.language.AppLanguage
+import ru.mikaeliv.beers.composeDS.language.LanguageState
 import ru.mikaeliv.beers.composeDS.theme.ThemeState
 import kotlin.test.AfterTest
 import kotlin.test.Test
@@ -15,6 +17,7 @@ class SettingsComponentTest {
     @AfterTest
     fun tearDown() {
         ThemeState.toggleDarkTheme(false)
+        LanguageState.selectLanguage(AppLanguage.English)
     }
 
     /**
@@ -27,6 +30,7 @@ class SettingsComponentTest {
         val fixture = createFixture()
 
         assertEquals(true, fixture.component.state.value.isDarkTheme)
+        assertEquals(AppLanguage.English, fixture.component.state.value.language)
     }
 
     /**
@@ -40,6 +44,19 @@ class SettingsComponentTest {
 
         assertEquals(true, ThemeState.isDarkTheme)
         assertEquals(true, fixture.component.state.value.isDarkTheme)
+    }
+
+    /**
+     * Проверяет, что переключение языка обновляет и глобальный LanguageState, и state компонента.
+     */
+    @Test
+    fun onLanguageChangeUpdatesLanguageStateAndComponentState() {
+        val fixture = createFixture()
+
+        fixture.component.onLanguageChange(AppLanguage.Russian)
+
+        assertEquals(AppLanguage.Russian, LanguageState.language)
+        assertEquals(AppLanguage.Russian, fixture.component.state.value.language)
     }
 
     /**

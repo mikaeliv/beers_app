@@ -13,6 +13,7 @@ import com.arkivanov.essenty.instancekeeper.InstanceKeeperDispatcher
 import com.arkivanov.essenty.lifecycle.asEssentyLifecycle
 import com.arkivanov.essenty.statekeeper.StateKeeperDispatcher
 import ru.mikaeliv.beers.composeDS.storage.SettingsStorage
+import ru.mikaeliv.beers.composeDS.language.LanguageState
 import ru.mikaeliv.beers.composeDS.theme.ThemeState
 import ru.mikaeliv.beers.network.connectivity.NetworkState
 import ru.mikaeliv.beers.network.auth.initTokenStorage
@@ -32,7 +33,9 @@ class MainActivity : ComponentActivity() {
         NetworkState.init(createNetworkMonitor())
 
         // Инициализируем тему из сохраненных настроек
-        ThemeState.init(SettingsStorage(this))
+        val settingsStorage = SettingsStorage(this)
+        ThemeState.init(settingsStorage)
+        LanguageState.init(settingsStorage)
 
         RepositoryProvider.provideRepository(DatabaseDriverFactory(this)) { repo ->
             val lifecycle = lifecycle.asEssentyLifecycle()

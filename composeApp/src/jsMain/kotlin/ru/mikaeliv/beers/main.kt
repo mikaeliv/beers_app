@@ -10,6 +10,7 @@ import com.arkivanov.essenty.instancekeeper.InstanceKeeperDispatcher
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
 import com.arkivanov.essenty.statekeeper.StateKeeperDispatcher
 import ru.mikaeliv.beers.composeDS.storage.SettingsStorage
+import ru.mikaeliv.beers.composeDS.language.LanguageState
 import ru.mikaeliv.beers.composeDS.theme.ThemeState
 import ru.mikaeliv.beers.network.connectivity.NetworkState
 import ru.mikaeliv.beers.data.DatabaseDriverFactory
@@ -24,7 +25,9 @@ fun main() {
     NetworkState.init(createNetworkMonitor())
     
     // Инициализируем тему из сохраненных настроек
-    ThemeState.init(SettingsStorage(null))
+    val settingsStorage = SettingsStorage(null)
+    ThemeState.init(settingsStorage)
+    LanguageState.init(settingsStorage)
 
     ComposeViewport(document.body!!) {
         val (repo, setRepo) = remember { mutableStateOf<ru.mikaeliv.beers.data.IBeerRepository?>(null) }

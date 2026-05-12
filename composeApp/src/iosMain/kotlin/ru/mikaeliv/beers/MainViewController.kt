@@ -10,6 +10,7 @@ import com.arkivanov.essenty.statekeeper.StateKeeperDispatcher
 import com.arkivanov.essenty.instancekeeper.InstanceKeeperDispatcher
 import com.arkivanov.essenty.backhandler.BackDispatcher
 import ru.mikaeliv.beers.composeDS.storage.SettingsStorage
+import ru.mikaeliv.beers.composeDS.theme.LanguageState
 import ru.mikaeliv.beers.composeDS.theme.ThemeState
 import ru.mikaeliv.beers.network.connectivity.NetworkState
 import ru.mikaeliv.beers.network.connectivity.createNetworkMonitor
@@ -22,7 +23,9 @@ fun MainViewController() = ComposeUIViewController {
         if (!initialized) {
             initialized = true
             NetworkState.init(createNetworkMonitor())
-            ThemeState.init(SettingsStorage(null))
+            val settingsStorage = SettingsStorage(null)
+            ThemeState.init(settingsStorage)
+            LanguageState.init(settingsStorage)
         }
     }
 

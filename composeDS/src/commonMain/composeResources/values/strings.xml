@@ -47,12 +47,12 @@
     <string name="settings_language_english">English</string>
     <string name="settings_language_russian">Russian</string>
     <string name="settings_app_version">Beers v%1$s</string>
-    <string name="settings_app_tagline">Your craft beer journal</string>
+    <string name="settings_app_tagline">Your beer journal</string>
     <string name="beer_detail_not_found">Beer not found</string>
     <string name="beer_detail_rating_label">Rating</string>
     
     <!-- Экран авторизации -->
-    <string name="auth_login_title">BeerLog</string>
+    <string name="auth_login_title">Beers</string>
     <string name="auth_register_title">Create Account</string>
     <string name="auth_email_label">Username</string>
     <string name="auth_password_label">Password</string>
@@ -60,7 +60,7 @@
     <string name="auth_register_button">Create Account</string>
     <string name="auth_switch_to_register">Don&apos;t have an account? Sign Up</string>
     <string name="auth_switch_to_login">Already have an account? Sign In</string>
-    <string name="auth_login_subtitle">Track your craft beer journey</string>
+    <string name="auth_login_subtitle">Track your beer journey</string>
     <string name="auth_register_subtitle">Start your beer collection</string>
     <string name="auth_login_username_placeholder">Enter your username</string>
     <string name="auth_register_username_placeholder">Choose a username</string>
