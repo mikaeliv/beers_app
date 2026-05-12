@@ -26,13 +26,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import beers.composeds.generated.resources.Res
-import beers.composeds.generated.resources.profile_beers_stat
+import beers.composeds.generated.resources.profile_beers_count
 import beers.composeds.generated.resources.profile_logout
 import beers.composeds.generated.resources.profile_rating_stat
 import beers.composeds.generated.resources.profile_settings
 import beers.composeds.generated.resources.profile_title
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import kotlin.math.roundToInt
+import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 import ru.mikaeliv.beers.composeDS.components.BeersButton
 import ru.mikaeliv.beers.composeDS.components.BeersTopAppBar
@@ -86,7 +87,7 @@ fun ProfileScreen(component: ProfileComponent) {
                 ) {
                     StatCard(
                         value = state.beerCount.toString(),
-                        label = stringResource(Res.string.profile_beers_stat),
+                        label = pluralStringResource(Res.plurals.profile_beers_count, state.beerCount),
                         modifier = Modifier.weight(1f).fillMaxHeight()
                     ) {
                         BeerIcon(size = 24.dp, tint = MaterialTheme.colorScheme.primary)

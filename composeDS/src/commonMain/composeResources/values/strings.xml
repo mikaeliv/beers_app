@@ -75,7 +75,11 @@
     <string name="profile_settings">Settings</string>
     <string name="profile_logout">Logout</string>
     <string name="profile_beers_stat">Beers</string>
-    <string name="profile_rating_stat">Rating</string>
+    <plurals name="profile_beers_count">
+        <item quantity="one">Beer</item>
+        <item quantity="other">Beers</item>
+    </plurals>
+    <string name="profile_rating_stat">On average</string>
 
     <!-- Экран камеры -->
     <string name="camera_title">Camera</string>
