@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="beers_background">#FAF8F5</color>
+    <color name="beers_primary">#E8915B</color>
+    <color name="beers_primary_container">#F9E8DD</color>
+</resources>
