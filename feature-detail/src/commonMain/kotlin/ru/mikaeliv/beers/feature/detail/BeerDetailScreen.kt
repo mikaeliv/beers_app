@@ -22,8 +22,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import beers.composeds.generated.resources.Res
+import beers.composeds.generated.resources.abv_badge
 import beers.composeds.generated.resources.beer_detail_not_found
-import beers.composeds.generated.resources.delete
+import beers.composeds.generated.resources.beer_detail_tasting_notes
+import beers.composeds.generated.resources.delete_beer
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import org.jetbrains.compose.resources.stringResource
 import ru.mikaeliv.beers.composeDS.components.AbvBadge
@@ -95,14 +97,14 @@ private fun BeerDetailContent(
                 style = MaterialTheme.typography.headlineLarge,
                 color = MaterialTheme.colorScheme.onBackground
             )
-            AbvBadge("${beer.abv}% ABV")
+            AbvBadge(stringResource(Res.string.abv_badge, beer.abv.toString()))
             StarRating(rating = beer.rating, starSize = 34.dp, modifier = Modifier.padding(top = 8.dp))
         }
 
         if (!beer.comment.isNullOrBlank()) {
             Column(verticalArrangement = Arrangement.spacedBy(18.dp), modifier = Modifier.padding(top = 8.dp)) {
                 Text(
-                    "TASTING NOTES",
+                    stringResource(Res.string.beer_detail_tasting_notes),
                     style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -115,7 +117,7 @@ private fun BeerDetailContent(
         }
 
         BeersButton(
-            text = "${stringResource(Res.string.delete)} Beer",
+            text = stringResource(Res.string.delete_beer),
             onClick = onDelete,
             modifier = Modifier
                 .fillMaxWidth()

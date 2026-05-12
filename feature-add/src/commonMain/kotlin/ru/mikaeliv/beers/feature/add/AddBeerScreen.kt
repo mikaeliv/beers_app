@@ -36,10 +36,19 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import beers.composeds.generated.resources.Res
 import beers.composeds.generated.resources.add_beer_abv_label
+import beers.composeds.generated.resources.add_beer_abv_placeholder
+import beers.composeds.generated.resources.add_beer_choose_gallery_subtitle
+import beers.composeds.generated.resources.add_beer_choose_gallery_title
 import beers.composeds.generated.resources.add_beer_comment_label
+import beers.composeds.generated.resources.add_beer_comment_placeholder
 import beers.composeds.generated.resources.add_beer_name_label
+import beers.composeds.generated.resources.add_beer_name_placeholder
 import beers.composeds.generated.resources.add_beer_photo_label
+import beers.composeds.generated.resources.add_beer_photo_sheet_title
 import beers.composeds.generated.resources.add_beer_rating_label
+import beers.composeds.generated.resources.add_beer_take_photo_subtitle
+import beers.composeds.generated.resources.add_beer_take_photo_title
+import beers.composeds.generated.resources.add_beer_tap_photo
 import beers.composeds.generated.resources.add_beer_title
 import beers.composeds.generated.resources.ic_add
 import beers.composeds.generated.resources.save
@@ -138,7 +147,7 @@ fun AddBeerScreen(component: AddBeerComponent) {
                     modifier = Modifier.fillMaxWidth(),
                     value = state.name,
                     onValueChange = component::onNameChange,
-                    placeholder = "Enter beer name",
+                    placeholder = stringResource(Res.string.add_beer_name_placeholder),
                     singleLine = true,
                     enabled = !state.isSaving
                 )
@@ -163,7 +172,7 @@ fun AddBeerScreen(component: AddBeerComponent) {
                         }
                         component.onAbvChange(cleaned)
                     },
-                    placeholder = "e.g., 5.5",
+                    placeholder = stringResource(Res.string.add_beer_abv_placeholder),
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     enabled = !state.isSaving
@@ -184,7 +193,7 @@ fun AddBeerScreen(component: AddBeerComponent) {
                     modifier = Modifier.fillMaxWidth(),
                     value = state.comment,
                     onValueChange = component::onCommentChange,
-                    placeholder = "Describe the beer's flavor, aroma, and your thoughts...",
+                    placeholder = stringResource(Res.string.add_beer_comment_placeholder),
                     singleLine = false,
                     minLines = 4,
                     enabled = !state.isSaving
@@ -225,19 +234,19 @@ private fun PhotoSourceSheet(
             .padding(start = 12.dp, end = 12.dp, bottom = 28.dp),
     ) {
         Text(
-            text = "Add photo",
+            text = stringResource(Res.string.add_beer_photo_sheet_title),
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 12.dp)
         )
         PhotoSourceItem(
-            title = "Take photo",
-            subtitle = "Open custom camera",
+            title = stringResource(Res.string.add_beer_take_photo_title),
+            subtitle = stringResource(Res.string.add_beer_take_photo_subtitle),
             onClick = onCameraClick
         )
         PhotoSourceItem(
-            title = "Choose from gallery",
-            subtitle = "Open image picker",
+            title = stringResource(Res.string.add_beer_choose_gallery_title),
+            subtitle = stringResource(Res.string.add_beer_choose_gallery_subtitle),
             onClick = onGalleryClick
         )
     }
@@ -307,7 +316,7 @@ private fun PhotoPickerCard(
                     )
                 }
                 Text(
-                    text = "Tap to add photo",
+                    text = stringResource(Res.string.add_beer_tap_photo),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

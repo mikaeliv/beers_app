@@ -27,6 +27,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import beers.composeds.generated.resources.Res
+import beers.composeds.generated.resources.settings_app_tagline
+import beers.composeds.generated.resources.settings_app_version
+import beers.composeds.generated.resources.settings_appearance
+import beers.composeds.generated.resources.settings_theme_dark
+import beers.composeds.generated.resources.settings_theme_light
 import beers.composeds.generated.resources.settings_title
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import org.jetbrains.compose.resources.stringResource
@@ -58,7 +63,7 @@ fun SettingsScreen(component: SettingsComponent) {
             ) {
                 Spacer(modifier = Modifier.height(48.dp))
                 Text(
-                    text = "APPEARANCE",
+                    text = stringResource(Res.string.settings_appearance),
                     style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -74,7 +79,7 @@ fun SettingsScreen(component: SettingsComponent) {
                         horizontalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
                         ThemeOption(
-                            title = "Light",
+                            title = stringResource(Res.string.settings_theme_light),
                             selected = !state.isDarkTheme,
                             modifier = Modifier.weight(1f),
                             onClick = { component.onDarkThemeToggle(false) }
@@ -82,7 +87,7 @@ fun SettingsScreen(component: SettingsComponent) {
                             SunIcon(size = 30.dp, tint = MaterialTheme.colorScheme.primary)
                         }
                         ThemeOption(
-                            title = "Dark",
+                            title = stringResource(Res.string.settings_theme_dark),
                             selected = state.isDarkTheme,
                             modifier = Modifier.weight(1f),
                             onClick = { component.onDarkThemeToggle(true) }
@@ -92,12 +97,22 @@ fun SettingsScreen(component: SettingsComponent) {
                     }
                 }
                 Spacer(modifier = Modifier.height(116.dp))
-                Text(
-                    text = "BeerLog v1.0.0\nYour craft beer journal",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                )
+                Column(
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(
+                        text = stringResource(Res.string.settings_app_version, APP_VERSION),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                    )
+                    Text(
+                        text = stringResource(Res.string.settings_app_tagline),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                    )
+                }
             }
         }
     )

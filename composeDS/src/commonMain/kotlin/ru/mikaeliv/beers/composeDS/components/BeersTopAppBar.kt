@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.unit.dp
 import beers.composeds.generated.resources.Res
+import beers.composeds.generated.resources.add_beer_title
 import beers.composeds.generated.resources.ic_arrow_back
 import beers.composeds.generated.resources.icon_back
 import org.jetbrains.compose.resources.painterResource
@@ -83,7 +84,7 @@ fun BeersTopAppBar(
 private fun BeersTopAppBarPreview() {
     BeersTheme {
         BeersTopAppBar(
-            title = "Add Beer",
+            title = stringResource(Res.string.add_beer_title),
             onBack = {}
         )
     }

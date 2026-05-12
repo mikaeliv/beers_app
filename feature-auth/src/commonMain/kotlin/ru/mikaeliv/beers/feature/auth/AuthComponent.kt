@@ -19,9 +19,14 @@ data class AuthState(
     val email: String = "",
     val password: String = "",
     val isLoading: Boolean = false,
-    val error: String? = null,
+    val error: AuthError? = null,
     val isLoginMode: Boolean = true, // true = вход, false = регистрация
 )
+
+sealed interface AuthError {
+    data object FillFields : AuthError
+    data class Message(val value: String) : AuthError
+}
 
 interface AuthComponent {
     val state: Value<AuthState>
@@ -66,7 +71,7 @@ class DefaultAuthComponent(
     override fun onSubmit() {
         val s = _state.value
         if (s.email.isBlank() || s.password.isBlank()) {
-            _state.value = s.copy(error = "Заполните все поля")
+            _state.value = s.copy(error = AuthError.FillFields)
             return
         }
 
@@ -88,7 +93,7 @@ class DefaultAuthComponent(
                 .onError { error ->
                     _state.value = _state.value.copy(
                         isLoading = false,
-                        error = error.message
+                        error = AuthError.Message(error.message)
                     )
                 }
         }

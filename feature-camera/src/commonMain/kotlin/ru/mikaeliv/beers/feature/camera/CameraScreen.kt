@@ -23,6 +23,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import beers.composeds.generated.resources.Res
+import beers.composeds.generated.resources.camera_title
+import org.jetbrains.compose.resources.stringResource
 import ru.mikaeliv.beers.composeDS.components.BeersTopAppBar
 import ru.mikaeliv.beers.composeDS.components.RoundIconSurface
 
@@ -50,7 +53,7 @@ fun CameraScreen(component: CameraComponent) {
 
         Column(modifier = Modifier.fillMaxSize()) {
             BeersTopAppBar(
-                title = "Camera",
+                title = stringResource(Res.string.camera_title),
                 onBack = component::onBack
             )
             Spacer(modifier = Modifier.weight(1f))

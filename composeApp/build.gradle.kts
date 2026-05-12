@@ -11,6 +11,8 @@ plugins {
     alias(libs.plugins.kotlinSerialization)
 }
 
+val appVersion = providers.gradleProperty("app.version").get()
+
 // Основной модуль приложения (Android, Desktop, JS). Здесь собирается UI и подключаются фичи.
 
 kotlin {
@@ -96,7 +98,7 @@ android {
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
-        versionName = "1.0"
+        versionName = appVersion
     }
     packaging {
         resources {
@@ -125,7 +127,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "ru.mikaeliv.beers"
-            packageVersion = "1.0.0"
+            packageVersion = appVersion
         }
     }
 }

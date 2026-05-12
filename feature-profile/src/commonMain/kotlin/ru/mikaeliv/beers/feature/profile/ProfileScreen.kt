@@ -26,7 +26,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import beers.composeds.generated.resources.Res
+import beers.composeds.generated.resources.profile_beers_stat
 import beers.composeds.generated.resources.profile_logout
+import beers.composeds.generated.resources.profile_rating_stat
 import beers.composeds.generated.resources.profile_settings
 import beers.composeds.generated.resources.profile_title
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
@@ -84,14 +86,14 @@ fun ProfileScreen(component: ProfileComponent) {
                 ) {
                     StatCard(
                         value = state.beerCount.toString(),
-                        label = "Beers",
+                        label = stringResource(Res.string.profile_beers_stat),
                         modifier = Modifier.weight(1f).fillMaxHeight()
                     ) {
                         BeerIcon(size = 24.dp, tint = MaterialTheme.colorScheme.primary)
                     }
                     StatCard(
                         value = state.averageRating.toString(),
-                        label = "Rating",
+                        label = stringResource(Res.string.profile_rating_stat),
                         modifier = Modifier.weight(1f).fillMaxHeight()
                     ) {
                         StarRating(rating = 1, maxRating = 1, starSize = 24.dp)

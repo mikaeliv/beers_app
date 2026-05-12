@@ -17,6 +17,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import beers.composeds.generated.resources.Res
+import beers.composeds.generated.resources.add_beer_photo_label
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.decodeToImageBitmap
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import ru.mikaeliv.beers.composeDS.icons.BeerIcon
@@ -106,7 +109,7 @@ private fun BeerPhotoPreview() {
     BeersTheme {
         BeerPhoto(
             photoBytes = null,
-            contentDescription = "Beer photo",
+            contentDescription = stringResource(Res.string.add_beer_photo_label),
             modifier = Modifier.size(180.dp)
         )
     }

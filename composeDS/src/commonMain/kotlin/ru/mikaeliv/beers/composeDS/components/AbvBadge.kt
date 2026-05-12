@@ -8,6 +8,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import beers.composeds.generated.resources.Res
+import beers.composeds.generated.resources.abv_badge
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import ru.mikaeliv.beers.composeDS.theme.BeersTheme
 
@@ -30,6 +33,6 @@ fun AbvBadge(
 @Composable
 private fun AbvBadgePreview() {
     BeersTheme {
-        AbvBadge(text = "6.5% ABV")
+        AbvBadge(text = stringResource(Res.string.abv_badge, "6.5"))
     }
 }

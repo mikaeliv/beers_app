@@ -5,6 +5,8 @@ import androidx.compose.ui.window.application
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import beers.composeds.generated.resources.Res
+import beers.composeds.generated.resources.app_name
 import ru.mikaeliv.beers.data.DatabaseDriverFactory
 import ru.mikaeliv.beers.di.RepositoryProvider
 import ru.mikaeliv.beers.ui.BeersAppWithContext
@@ -16,6 +18,7 @@ import ru.mikaeliv.beers.composeDS.storage.SettingsStorage
 import ru.mikaeliv.beers.composeDS.theme.ThemeState
 import ru.mikaeliv.beers.network.connectivity.NetworkState
 import ru.mikaeliv.beers.network.connectivity.createNetworkMonitor
+import org.jetbrains.compose.resources.getString
 
 fun main() {
     // Инициализируем мониторинг сети
@@ -25,9 +28,14 @@ fun main() {
     ThemeState.init(SettingsStorage(null))
 
     application {
+        val (windowTitle, setWindowTitle) = remember { mutableStateOf("") }
+        LaunchedEffect(Unit) {
+            setWindowTitle(getString(Res.string.app_name))
+        }
+
         Window(
             onCloseRequest = ::exitApplication,
-            title = "Beers",
+            title = windowTitle,
         ) {
             val (repo, setRepo) = remember { mutableStateOf<ru.mikaeliv.beers.data.IBeerRepository?>(null) }
             LaunchedEffect(Unit) {

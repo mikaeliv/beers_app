@@ -78,7 +78,7 @@ class AuthComponentTest {
         fixture.component.onSubmit()
         advanceUntilIdle()
 
-        assertEquals("Заполните все поля", fixture.component.state.value.error)
+        assertEquals(AuthError.FillFields, fixture.component.state.value.error)
         assertEquals(0, fixture.authApi.loginCalls)
         assertEquals(0, fixture.output.successCalls)
     }
@@ -131,7 +131,7 @@ class AuthComponentTest {
         advanceUntilIdle()
 
         assertFalse(fixture.component.state.value.isLoading)
-        assertEquals("Bad credentials", fixture.component.state.value.error)
+        assertEquals(AuthError.Message("Bad credentials"), fixture.component.state.value.error)
         assertEquals(0, fixture.output.successCalls)
     }
 

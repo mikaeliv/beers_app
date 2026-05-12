@@ -33,11 +33,20 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import beers.composeds.generated.resources.Res
 import beers.composeds.generated.resources.auth_email_label
+import beers.composeds.generated.resources.auth_confirm_password_label
+import beers.composeds.generated.resources.auth_confirm_password_placeholder
+import beers.composeds.generated.resources.auth_error_fill_fields
+import beers.composeds.generated.resources.auth_login_password_placeholder
 import beers.composeds.generated.resources.auth_login_button
+import beers.composeds.generated.resources.auth_login_subtitle
 import beers.composeds.generated.resources.auth_login_title
+import beers.composeds.generated.resources.auth_login_username_placeholder
 import beers.composeds.generated.resources.auth_password_label
+import beers.composeds.generated.resources.auth_register_password_placeholder
 import beers.composeds.generated.resources.auth_register_button
+import beers.composeds.generated.resources.auth_register_subtitle
 import beers.composeds.generated.resources.auth_register_title
+import beers.composeds.generated.resources.auth_register_username_placeholder
 import beers.composeds.generated.resources.auth_switch_to_login
 import beers.composeds.generated.resources.auth_switch_to_register
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
@@ -76,7 +85,7 @@ fun AuthScreen(component: AuthComponent) {
             textAlign = TextAlign.Center,
         )
         Text(
-            text = if (state.isLoginMode) "Track your craft beer journey" else "Start your beer collection",
+            text = if (state.isLoginMode) stringResource(Res.string.auth_login_subtitle) else stringResource(Res.string.auth_register_subtitle),
             style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(top = 12.dp)
@@ -88,7 +97,7 @@ fun AuthScreen(component: AuthComponent) {
         BeersPillTextField(
             value = state.email,
             onValueChange = component::onEmailChange,
-            placeholder = if (state.isLoginMode) "Enter your username" else "Choose a username",
+            placeholder = if (state.isLoginMode) stringResource(Res.string.auth_login_username_placeholder) else stringResource(Res.string.auth_register_username_placeholder),
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
             modifier = Modifier.fillMaxWidth(),
@@ -101,7 +110,7 @@ fun AuthScreen(component: AuthComponent) {
         BeersPillTextField(
             value = state.password,
             onValueChange = component::onPasswordChange,
-            placeholder = if (state.isLoginMode) "Enter your password" else "Create a password",
+            placeholder = if (state.isLoginMode) stringResource(Res.string.auth_login_password_placeholder) else stringResource(Res.string.auth_register_password_placeholder),
             singleLine = true,
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(
@@ -124,11 +133,11 @@ fun AuthScreen(component: AuthComponent) {
 
         if (!state.isLoginMode) {
             Spacer(modifier = Modifier.height(28.dp))
-            AuthFieldLabel("Confirm Password")
+            AuthFieldLabel(stringResource(Res.string.auth_confirm_password_label))
             BeersPillTextField(
                 value = confirmPassword,
                 onValueChange = { confirmPassword = it },
-                placeholder = "Confirm your password",
+                placeholder = stringResource(Res.string.auth_confirm_password_placeholder),
                 singleLine = true,
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
@@ -140,7 +149,11 @@ fun AuthScreen(component: AuthComponent) {
 
         if (state.error != null) {
             Text(
-                text = state.error!!,
+                text = when (val error = state.error) {
+                    AuthError.FillFields -> stringResource(Res.string.auth_error_fill_fields)
+                    is AuthError.Message -> error.value
+                    null -> ""
+                },
                 color = MaterialTheme.colorScheme.error,
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(top = 18.dp),

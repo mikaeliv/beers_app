@@ -13,6 +13,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import beers.composeds.generated.resources.Res
+import beers.composeds.generated.resources.add_beer_name_placeholder
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import ru.mikaeliv.beers.composeDS.theme.BeersTheme
 
@@ -70,7 +73,7 @@ private fun BeersPillTextFieldPreview() {
         BeersPillTextField(
             value = "",
             onValueChange = {},
-            placeholder = "Enter beer name",
+            placeholder = stringResource(Res.string.add_beer_name_placeholder),
         )
     }
 }

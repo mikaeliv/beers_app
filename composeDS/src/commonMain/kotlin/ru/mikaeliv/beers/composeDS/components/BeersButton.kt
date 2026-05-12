@@ -16,6 +16,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import beers.composeds.generated.resources.Res
+import beers.composeds.generated.resources.save
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import ru.mikaeliv.beers.composeDS.icons.AddIcon
 import ru.mikaeliv.beers.composeDS.theme.BeersTheme
@@ -59,7 +62,7 @@ fun BeersButton(
 private fun BeersButtonPreview() {
     BeersTheme {
         BeersButton(
-            text = "Save Beer",
+            text = stringResource(Res.string.save),
             onClick = {},
         )
     }
@@ -70,7 +73,7 @@ private fun BeersButtonPreview() {
 private fun BeersButtonPreviewWithIcon() {
     BeersTheme {
         BeersButton(
-            text = "Save Beer",
+            text = stringResource(Res.string.save),
             onClick = {},
             leadingIcon = {
                 AddIcon()

@@ -30,8 +30,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
+import beers.composeds.generated.resources.Res
+import beers.composeds.generated.resources.camera_permission_required
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import org.jetbrains.compose.resources.stringResource
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.util.concurrent.Executors
@@ -67,7 +70,7 @@ internal actual fun CameraPreview(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "Camera permission is required",
+                text = stringResource(Res.string.camera_permission_required),
                 color = MaterialTheme.colorScheme.onBackground,
                 style = MaterialTheme.typography.bodyMedium
             )

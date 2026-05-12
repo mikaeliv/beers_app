@@ -45,6 +45,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import beers.composeds.generated.resources.Res
+import beers.composeds.generated.resources.abv_badge
 import beers.composeds.generated.resources.beer_list_empty
 import beers.composeds.generated.resources.beer_list_empty_hint
 import beers.composeds.generated.resources.beer_list_title
@@ -296,7 +297,7 @@ private fun BeerCard(
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
-                AbvBadge("${beer.abv}% ABV")
+                AbvBadge(stringResource(Res.string.abv_badge, beer.abv.toString()))
                 StarRating(rating = beer.rating, starSize = 26.dp)
             }
         }
