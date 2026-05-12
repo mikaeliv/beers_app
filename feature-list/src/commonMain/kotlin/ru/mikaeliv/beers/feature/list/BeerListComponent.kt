@@ -9,10 +9,11 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import ru.mikaeliv.beers.core.Beer
 import ru.mikaeliv.beers.core.SyncActions
 import ru.mikaeliv.beers.data.IBeerRepository
+
+private const val EMPTY_LOAD_MORE_BEER_COUNT = 0
 
 interface BeerListComponent {
     /** Состояние: текущий список пив. */
@@ -60,6 +61,7 @@ class DefaultBeerListComponent(
     override val isRefreshing: StateFlow<Boolean> = syncEngine.isSyncing
     override val hasMorePages: StateFlow<Boolean> = syncEngine.hasMorePages
     override val isLoadingMore: StateFlow<Boolean> = syncEngine.isLoadingMore
+    private var lastLoadMoreBeerCount = -1
 
     init {
         scope.launch {
@@ -73,7 +75,19 @@ class DefaultBeerListComponent(
     override fun onAddClick() = output.openAdd()
     override fun onOpen(beerId: Long) = output.openDetail(beerId)
     override fun onProfileClick() = output.openProfile()
-    override fun onRefresh() = syncEngine.sync()
-    override fun onLoadMore() = syncEngine.loadMore()
+    override fun onRefresh() {
+        lastLoadMoreBeerCount = -1
+        syncEngine.sync()
+    }
+    override fun onLoadMore() {
+        val beerCount = state.value.size
+        if (beerCount == EMPTY_LOAD_MORE_BEER_COUNT) return
+        if (!hasMorePages.value) return
+        if (isLoadingMore.value) return
+        if (beerCount == lastLoadMoreBeerCount) return
+
+        lastLoadMoreBeerCount = beerCount
+        syncEngine.loadMore()
+    }
     override fun onDestroy() { scope.cancel() }
 }

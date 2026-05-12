@@ -39,6 +39,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -50,6 +51,7 @@ import beers.composeds.generated.resources.beer_list_empty
 import beers.composeds.generated.resources.beer_list_empty_hint
 import beers.composeds.generated.resources.beer_list_title
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
+import kotlinx.coroutines.flow.distinctUntilChanged
 import org.jetbrains.compose.resources.stringResource
 import ru.mikaeliv.beers.composeDS.components.AbvBadge
 import ru.mikaeliv.beers.composeDS.components.BeerPhoto
@@ -67,7 +69,6 @@ private const val LOAD_MORE_THRESHOLD = 3
 fun BeerListScreen(component: BeerListComponent) {
     val beers by component.state.subscribeAsState()
     val isRefreshing by component.isRefreshing.collectAsState()
-    val hasMorePages by component.hasMorePages.collectAsState()
     val isLoadingMore by component.isLoadingMore.collectAsState()
     val pullToRefreshState = rememberPullToRefreshState()
     val listState = rememberLazyListState()
@@ -107,7 +108,6 @@ fun BeerListScreen(component: BeerListComponent) {
                 beers = beers,
                 isRefreshing = isRefreshing,
                 listState = listState,
-                hasMorePages = hasMorePages,
                 isLoadingMore = isLoadingMore,
                 onOpen = component::onOpen,
                 onLoadMore = component::onLoadMore,
@@ -126,19 +126,28 @@ private fun BeerGridContent(
     beers: List<Beer>,
     isRefreshing: Boolean,
     listState: LazyListState,
-    hasMorePages: Boolean,
     isLoadingMore: Boolean,
     onOpen: (Long) -> Unit,
     onLoadMore: () -> Unit,
 ) {
-    LaunchedEffect(listState, hasMorePages, isLoadingMore) {
-        val layoutInfo = listState.layoutInfo
-        val totalItems = layoutInfo.totalItemsCount
-        val lastVisibleItem = layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
-        if (totalItems > 0 && lastVisibleItem >= totalItems - LOAD_MORE_THRESHOLD && hasMorePages && !isLoadingMore) {
-            onLoadMore()
+    LaunchedEffect(listState) {
+        snapshotFlow {
+            val layoutInfo = listState.layoutInfo
+            LoadMoreViewport(
+                totalItems = layoutInfo.totalItemsCount,
+                lastVisibleItem = layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: -1,
+            )
         }
-    }
+            .distinctUntilChanged()
+            .collect { viewport ->
+                val reachedThreshold = viewport.totalItems > 0 &&
+                    viewport.lastVisibleItem >= viewport.totalItems - LOAD_MORE_THRESHOLD
+
+                if (reachedThreshold) {
+                    onLoadMore()
+                }
+            }
+        }
 
     LazyColumn(
         state = listState,

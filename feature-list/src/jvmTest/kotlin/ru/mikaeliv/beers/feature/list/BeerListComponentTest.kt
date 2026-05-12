@@ -54,17 +54,85 @@ class BeerListComponentTest {
     }
 
     /**
-     * Проверяет, что refresh и loadMore делегируются в SyncActions.
+     * Проверяет, что refresh делегируется в SyncActions.
      */
     @Test
-    fun refreshAndLoadMoreCallSyncActions() = runTest {
+    fun refreshCallsSyncActions() = runTest {
         val fixture = createFixture()
 
         fixture.component.onRefresh()
-        fixture.component.onLoadMore()
 
         assertEquals(1, fixture.syncActions.syncCalls)
+    }
+
+    /**
+     * Проверяет, что loadMore делегируется только если следующую страницу можно запросить.
+     */
+    @Test
+    fun loadMoreCallsSyncActionsWhenNextPageCanBeRequested() = runTest {
+        val fixture = createFixture()
+        fixture.repository.emit(listOf(beer(1L), beer(2L)))
+        fixture.syncActions.setHasMorePages(true)
+        advanceUntilIdle()
+
+        fixture.component.onLoadMore()
+
         assertEquals(1, fixture.syncActions.loadMoreCalls)
+    }
+
+    /**
+     * Проверяет, что loadMore не повторяет запрос для того же размера списка.
+     */
+    @Test
+    fun loadMoreSkipsRepeatedRequestForSameBeerCount() = runTest {
+        val fixture = createFixture()
+        fixture.repository.emit(listOf(beer(1L), beer(2L)))
+        fixture.syncActions.setHasMorePages(true)
+        advanceUntilIdle()
+
+        fixture.component.onLoadMore()
+        fixture.component.onLoadMore()
+
+        assertEquals(1, fixture.syncActions.loadMoreCalls)
+    }
+
+    /**
+     * Проверяет, что loadMore снова разрешён после появления новых элементов.
+     */
+    @Test
+    fun loadMoreCanRequestAgainAfterBeerCountChanges() = runTest {
+        val fixture = createFixture()
+        fixture.syncActions.setHasMorePages(true)
+        fixture.repository.emit(listOf(beer(1L), beer(2L)))
+        advanceUntilIdle()
+
+        fixture.component.onLoadMore()
+        fixture.repository.emit(listOf(beer(1L), beer(2L), beer(3L)))
+        advanceUntilIdle()
+        fixture.component.onLoadMore()
+
+        assertEquals(2, fixture.syncActions.loadMoreCalls)
+    }
+
+    /**
+     * Проверяет, что loadMore не запускается без данных, без следующей страницы или во время загрузки.
+     */
+    @Test
+    fun loadMoreSkipsWhenRequestIsNotAllowed() = runTest {
+        val fixture = createFixture()
+
+        fixture.component.onLoadMore()
+
+        fixture.repository.emit(listOf(beer(1L)))
+        fixture.syncActions.setHasMorePages(false)
+        advanceUntilIdle()
+        fixture.component.onLoadMore()
+
+        fixture.syncActions.setHasMorePages(true)
+        fixture.syncActions.setLoadingMore(true)
+        fixture.component.onLoadMore()
+
+        assertEquals(0, fixture.syncActions.loadMoreCalls)
     }
 
     /**
