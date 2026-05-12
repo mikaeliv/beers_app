@@ -6,6 +6,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -30,6 +32,9 @@ import beers.composeds.generated.resources.Res
 import beers.composeds.generated.resources.settings_app_tagline
 import beers.composeds.generated.resources.settings_app_version
 import beers.composeds.generated.resources.settings_appearance
+import beers.composeds.generated.resources.settings_language
+import beers.composeds.generated.resources.settings_language_english
+import beers.composeds.generated.resources.settings_language_russian
 import beers.composeds.generated.resources.settings_theme_dark
 import beers.composeds.generated.resources.settings_theme_light
 import beers.composeds.generated.resources.settings_title
@@ -54,68 +59,112 @@ fun SettingsScreen(component: SettingsComponent) {
             )
         },
         content = { padding ->
-            Column(
+            LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(MaterialTheme.colorScheme.background)
-                    .padding(padding)
-                    .padding(horizontal = 24.dp),
+                    .padding(padding),
+                contentPadding = PaddingValues(start = 24.dp, end = 24.dp, top = 48.dp, bottom = 40.dp),
+                verticalArrangement = Arrangement.spacedBy(32.dp)
             ) {
-                Spacer(modifier = Modifier.height(48.dp))
-                Text(
-                    text = stringResource(Res.string.settings_appearance),
-                    style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Spacer(modifier = Modifier.height(24.dp))
-                Surface(
-                    modifier = Modifier.fillMaxWidth().height(162.dp),
-                    shape = RoundedCornerShape(30.dp),
-                    color = MaterialTheme.colorScheme.surface,
-                    shadowElevation = 8.dp
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxSize().padding(10.dp),
-                        horizontalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
-                        ThemeOption(
-                            title = stringResource(Res.string.settings_theme_light),
-                            selected = !state.isDarkTheme,
-                            modifier = Modifier.weight(1f),
-                            onClick = { component.onDarkThemeToggle(false) }
-                        ) {
+                item {
+                    SettingsSectionTitle(stringResource(Res.string.settings_appearance))
+                    Spacer(modifier = Modifier.height(24.dp))
+                    SettingsSwitch(
+                        isFirst = !state.isDarkTheme,
+                        firstTitle = stringResource(Res.string.settings_theme_light),
+                        secondTitle = stringResource(Res.string.settings_theme_dark),
+                        firstIcon = {
                             SunIcon(size = 30.dp, tint = MaterialTheme.colorScheme.primary)
-                        }
-                        ThemeOption(
-                            title = stringResource(Res.string.settings_theme_dark),
-                            selected = state.isDarkTheme,
-                            modifier = Modifier.weight(1f),
-                            onClick = { component.onDarkThemeToggle(true) }
-                        ) {
+                        },
+                        secondIcon = {
                             MoonIcon(size = 30.dp, tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                        },
+                        onToggle = { isFirst ->
+                            component.onDarkThemeToggle(!isFirst)
                         }
-                    }
+                    )
                 }
-                Spacer(modifier = Modifier.height(116.dp))
-                Column(
-                    modifier = Modifier.align(Alignment.CenterHorizontally),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    Text(
-                        text = stringResource(Res.string.settings_app_version, APP_VERSION),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+
+                item {
+                    SettingsSectionTitle(stringResource(Res.string.settings_language))
+                    Spacer(modifier = Modifier.height(24.dp))
+                    SettingsSwitch(
+                        isFirst = true,
+                        firstTitle = stringResource(Res.string.settings_language_english),
+                        secondTitle = stringResource(Res.string.settings_language_russian),
+                        onToggle = {}
                     )
-                    Text(
-                        text = stringResource(Res.string.settings_app_tagline),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                    )
+                }
+
+                item {
+                    Spacer(modifier = Modifier.height(40.dp))
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Text(
+                            text = stringResource(Res.string.settings_app_version, APP_VERSION),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                        )
+                        Text(
+                            text = stringResource(Res.string.settings_app_tagline),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                        )
+                    }
                 }
             }
         }
     )
+}
+
+@Composable
+private fun SettingsSectionTitle(text: String) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.titleSmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant
+    )
+}
+
+@Composable
+private fun SettingsSwitch(
+    isFirst: Boolean,
+    firstTitle: String,
+    secondTitle: String,
+    firstIcon: (@Composable () -> Unit)? = null,
+    secondIcon: (@Composable () -> Unit)? = null,
+    onToggle: (isFirst: Boolean) -> Unit
+) {
+    Surface(
+        modifier = Modifier.fillMaxWidth().height(162.dp),
+        shape = RoundedCornerShape(30.dp),
+        color = MaterialTheme.colorScheme.surface,
+        shadowElevation = 8.dp
+    ) {
+        Row(
+            modifier = Modifier.fillMaxSize().padding(10.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            ThemeOption(
+                title = firstTitle,
+                selected = isFirst,
+                modifier = Modifier.weight(1f),
+                onClick = { onToggle(true) },
+                icon = firstIcon
+            )
+            ThemeOption(
+                title = secondTitle,
+                selected = !isFirst,
+                modifier = Modifier.weight(1f),
+                onClick = { onToggle(false) },
+                icon = secondIcon
+            )
+        }
+    }
 }
 
 @Composable
@@ -124,7 +173,7 @@ private fun ThemeOption(
     selected: Boolean,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
-    icon: @Composable () -> Unit,
+    icon: (@Composable () -> Unit)? = null
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     Box(
@@ -153,7 +202,9 @@ private fun ThemeOption(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(18.dp)
         ) {
-            RoundIconSurface(size = 58.dp, selected = selected) { icon() }
+            icon?.let {
+                RoundIconSurface(size = 58.dp, selected = selected) { icon() }
+            }
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleSmall,
