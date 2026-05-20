@@ -25,7 +25,7 @@ fun AbvBadge(
             .background(MaterialTheme.colorScheme.secondary, RoundedCornerShape(999.dp))
             .padding(horizontal = 18.dp, vertical = 8.dp),
         color = MaterialTheme.colorScheme.onSecondary,
-        style = MaterialTheme.typography.bodyMedium
+        style = MaterialTheme.typography.labelMedium
     )
 }
 

@@ -7,7 +7,7 @@
     <string name="delete">Удалить</string>
     <string name="delete_beer">Удалить пиво</string>
     <string name="add">Добавить</string>
-    <string name="abv_badge">%1$s%% ABV</string>
+    <string name="abv_badge">%1$s % ABV</string>
 
     <!-- Экран списка пива -->
     <string name="beer_list_title">Моя коллекция</string>

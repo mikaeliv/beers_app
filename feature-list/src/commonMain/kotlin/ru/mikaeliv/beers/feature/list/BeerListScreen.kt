@@ -307,7 +307,7 @@ private fun BeerCard(
                     overflow = TextOverflow.Ellipsis
                 )
                 AbvBadge(stringResource(Res.string.abv_badge, beer.abv.toString()))
-                StarRating(rating = beer.rating, starSize = 26.dp)
+                StarRating(rating = beer.rating, starSize = 20.dp)
             }
         }
     }
