@@ -1,5 +1,6 @@
 package ru.mikaeliv.beers.feature.add
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -51,8 +52,11 @@ import beers.composeds.generated.resources.add_beer_take_photo_title
 import beers.composeds.generated.resources.add_beer_tap_photo
 import beers.composeds.generated.resources.add_beer_title
 import beers.composeds.generated.resources.ic_add
+import beers.composeds.generated.resources.ic_camera
+import beers.composeds.generated.resources.ic_gallery
 import beers.composeds.generated.resources.save
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
+import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import ru.mikaeliv.beers.composeDS.components.BeerPhoto
@@ -242,11 +246,13 @@ private fun PhotoSourceSheet(
         PhotoSourceItem(
             title = stringResource(Res.string.add_beer_take_photo_title),
             subtitle = stringResource(Res.string.add_beer_take_photo_subtitle),
+            icon = Res.drawable.ic_camera,
             onClick = onCameraClick
         )
         PhotoSourceItem(
             title = stringResource(Res.string.add_beer_choose_gallery_title),
             subtitle = stringResource(Res.string.add_beer_choose_gallery_subtitle),
+            icon = Res.drawable.ic_gallery,
             onClick = onGalleryClick
         )
     }
@@ -256,6 +262,7 @@ private fun PhotoSourceSheet(
 private fun PhotoSourceItem(
     title: String,
     subtitle: String,
+    icon: DrawableResource,
     onClick: () -> Unit,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
@@ -268,8 +275,8 @@ private fun PhotoSourceItem(
         },
         leadingContent = {
             RoundIconSurface(size = 44.dp) {
-                androidx.compose.foundation.Image(
-                    painter = painterResource(Res.drawable.ic_add),
+                Image(
+                    painter = painterResource(icon),
                     contentDescription = null,
                     colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurfaceVariant),
                     modifier = Modifier.size(22.dp)
